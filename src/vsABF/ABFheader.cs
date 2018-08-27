@@ -15,9 +15,25 @@ namespace vsABF
             public string GetInfo()
             {
                 string info = $"\n### {this.GetType().Name} ###\n";
-                foreach (var x in this.GetType().GetFields())
+                foreach (System.Reflection.FieldInfo x in this.GetType().GetFields())
                 {
-                    info += $"{x.Name} = {x.GetValue(this)}\n";
+                    System.Object val = x.GetValue(this);
+
+                    string valStr = "";
+                    if (val.GetType().IsArray)
+                    {
+                        Array objects = (Array)val;
+                        string[] strings = new string[objects.GetUpperBound(0)];
+                        for(int i=0; i<strings.Length; i++)
+                        {
+                            strings[i] += objects.GetValue(i).ToString();
+                        }
+                        valStr += "["+string.Join(", ", strings.ToArray()) +"]";
+                    } else
+                    {
+                        valStr = val.ToString();
+                    }
+                    info += $"{x.Name} = {valStr}\n";
                 }
                 return info;
             }
