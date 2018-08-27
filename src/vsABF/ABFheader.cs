@@ -285,6 +285,7 @@ namespace vsABF
             this.log = log;
             ReadHeaderV2();
             ReadSectionMap();
+            ReadProtocolSection();
         }
 
 
@@ -330,6 +331,16 @@ namespace vsABF
             uProtocolPathIndex = FileReadUnsignedInt("uProtocolPathIndex", -1, 1); //I;
         }
 
+        public Section ProtocolSection;
+        public Section UserListSection;
+        public Section StatsRegionSection;
+        public Section MathSection;
+        public Section ScopeSection;
+        public Section DeltaSection;
+        public Section VoiceTagSection;
+        public Section SynchArraySection;
+        public Section AnnotationSection;
+        public Section StatsSection;
 
         private void ReadSectionMap()
         {
@@ -344,6 +355,11 @@ namespace vsABF
             Section SynchArraySection = new Section("SynchArraySection", br, log, 316);
             Section AnnotationSection = new Section("AnnotationSection", br, log, 332);
             Section StatsSection = new Section("StatsSection", br, log, 348);
+        }
+
+        private void ReadProtocolSection()
+        {
+
         }
 
     }
