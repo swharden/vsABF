@@ -52,7 +52,11 @@ namespace testForm
         {
             richTextBox1.Clear();
             ABF abf = new ABF(listBox1.SelectedValue.ToString());
-            richTextBox1.Text = abf.log.logText;
+            richTextBox1.Text = abf.log.logText + abf.GetHeaderInfo();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
         }
     }
 }

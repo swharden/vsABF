@@ -9,32 +9,50 @@ namespace vsABF
 {
     public partial class ABF
     {
-        private BinaryReader br;
         public Logger log;
+        public int abfVersionMajor = 0;
+        public ABFreader.HeaderV1 headerV1;
+        public ABFreader.HeaderV2 headerV2;
 
         public ABF(string abfFilePath)
         {
-            log = new Logger("ABFTEST");
-            log.Debug($"instantiating on: {abfFilePath}");
-            br = new BinaryReader(File.Open(abfFilePath, FileMode.Open));
+            // set up our logger, paths, and ensure file exists
+            log = new Logger("ABF");
+            abfFilePath = Path.GetFullPath(abfFilePath);
 
-            // determine if ABF is ABF1 or ABF2
-            var genericReader = new AbfHeaderReader(br, log);
-            string fileSignature = genericReader.FileReadString("fFileSignature", 0, 4);
-            if (fileSignature == "ABF ")
+            if (!File.Exists(abfFilePath))
             {
-                AbfHeaderV1 abfHeaderv1 = new AbfHeaderV1(br, log);
+                log.Critical($"File does not exist: {abfFilePath}");
+                return;
             }
-            else if (fileSignature == "ABF2")
+
+            log.Info($"Loading ABF file: {abfFilePath}");            
+            ABFreader abfReader = new ABFreader(abfFilePath, log);
+            if (abfReader.fileSignature=="ABF ")
             {
-                AbfHeaderV2 abfHeaderv2 = new AbfHeaderV2(br, log);
-            }
-            else
+                abfVersionMajor = 1;
+                headerV1 = abfReader.headerV1;
+            } else if (abfReader.fileSignature == "ABF2")
             {
-                log.Critical("Invalid ABF file.");
-            }
-            br.Close();
+                abfVersionMajor = 2;
+                headerV2 = abfReader.headerV2;
+            } else
+            {
+                log.Critical("Unrecognized file format");
+                return;
+            }           
+
         }
+
+        public string GetHeaderInfo()
+        {
+            if (abfVersionMajor == 1)
+                return headerV1.GetInfo();
+            if (abfVersionMajor == 2)
+                return headerV2.GetInfo();
+            return "asdf";
+        }
+
 
     }
 }

@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ABF.cs" />
+    <Compile Include="ABFreader.cs" />
     <Compile Include="logging.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ABFheader.cs" />
