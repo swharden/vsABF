@@ -9,46 +9,30 @@ namespace vsABF
 {
     public partial class ABF
     {
-        public Logger log = new Logger("ABF");
-        public string abfFilePath;
         private BinaryReader br;
+        public Logger log;
 
-        /// <summary>
-        /// The ABF class provides simple access to ABF header and signal data.
-        /// </summary>
-        /// <param name="abfFilePath">path to an ABF file</param>
-        public ABF(string abfFilePath="./someFile.abf")
+        public ABF(string abfFilePath)
         {
-            this.abfFilePath = System.IO.Path.GetFullPath(abfFilePath);
-            log.Info($"loading ABF File: {this.abfFilePath}");
+            log = new Logger("ABFTEST");
+            log.Debug($"instantiating on: {abfFilePath}");
+            br = new BinaryReader(File.Open(abfFilePath, FileMode.Open));
 
-            // ensure the ABF is valid and determine if it is ABF1 or ABF2 format
-            FileOpen();
-            string firstFewStr = FileReadString("", 0, 4);
-            if (firstFewStr=="ABF ")
+            // determine if ABF is ABF1 or ABF2
+            var genericReader = new AbfHeaderReader(br, log);
+            string fileSignature = genericReader.FileReadString("fFileSignature", 0, 4);
+            if (fileSignature == "ABF ")
             {
-                log.Debug("ABF format 1 detected");
-                ReadHeaderV1();
-            } else if (firstFewStr == "ABF2")
-            {
-                return;
-                log.Debug("ABF format 2 detected");
-            } else
-            {
-                log.Critical("file is not in ABF format");
+                AbfHeaderV1 abfHeaderv1 = new AbfHeaderV1(br, log);
             }
-            FileClose();
-        }
-
-        private void FileOpen()
-        {
-            log.Debug("opening ABF for reading");
-            br = new BinaryReader(File.Open(this.abfFilePath, FileMode.Open));
-        }
-
-        private void FileClose()
-        {
-            log.Debug("closing ABF for reading");
+            else if (fileSignature == "ABF2")
+            {
+                AbfHeaderV2 abfHeaderv2 = new AbfHeaderV2(br, log);
+            }
+            else
+            {
+                log.Critical("Invalid ABF file.");
+            }
             br.Close();
         }
 

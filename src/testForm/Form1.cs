@@ -8,33 +8,51 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using vsABF;
+using System.IO;
 
 namespace testForm
 {
     public partial class Form1 : Form
     {
-        ABFdev abfDev;
         Logger log;
+
+        private class AbfPath
+        {
+            public string abfPath { get; set; }
+            public string abfFileName { get; set; }
+            public string abfID { get; set; }
+        }
+
+        private List<AbfPath> abfPaths = new List<AbfPath>();
 
         public Form1()
         {
             InitializeComponent();
-            abfDev = new ABFdev();
             log = new Logger("Form");
-            button1_Click(null, null);
+            ScanAbfFolder(@"C:\Users\scott\Documents\GitHub\pyABF\data\abfs");
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        public void ScanAbfFolder(string abfFolder)
         {
-            //string[] abfFilePaths = System.IO.Directory.GetFiles(abfDev.GetAbfFolder(), "*.abf");
-            string[] abfFilePaths = System.IO.Directory.GetFiles(@"C:\Users\scott\Documents\GitHub\pyABF\data\abfs", "*.abf");
-            foreach (string abfFilePath in abfFilePaths)
+            abfPaths.Clear();
+            foreach (string abfFilePath in System.IO.Directory.GetFiles(abfFolder, "*.abf"))
             {
-                ABF abf = new ABF(abfFilePath);
-                richTextBox1.Text = abf.log.logText;
-                break;
-            }            
-            
+                AbfPath abfPath = new AbfPath() {
+                    abfPath = abfFilePath,
+                    abfFileName = Path.GetFileName(abfFilePath),
+                    abfID = Path.GetFileNameWithoutExtension(abfFilePath) };
+                abfPaths.Add(abfPath);
+            }
+            listBox1.DisplayMember = "abfID";
+            listBox1.ValueMember = "abfPath";
+            listBox1.DataSource = abfPaths;
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            richTextBox1.Clear();
+            ABF abf = new ABF(listBox1.SelectedValue.ToString());
+            richTextBox1.Text = abf.log.logText;
         }
     }
 }
