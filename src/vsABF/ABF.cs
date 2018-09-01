@@ -34,14 +34,14 @@ namespace vsABF
         public string[] dacNames;
         public double[] dataGainByChannel;
         public double[] dataOffsetByChannel;
+        public string protocolPath;
 
         public ABF(string abfFilePath)
         {
             // set up our logger, paths, and ensure file exists
             log = new Logger("ABF");
-            abfFilePath = Path.GetFullPath(abfFilePath);
-            this.abfFilePath = abfFilePath;
-            this.abfID = Path.GetFileNameWithoutExtension(abfFilePath);
+            this.abfFilePath = Path.GetFullPath(abfFilePath);
+            abfID = Path.GetFileNameWithoutExtension(abfFilePath);
 
             if (!File.Exists(abfFilePath))
             {
@@ -60,6 +60,7 @@ namespace vsABF
                 holdingCommand = abfReader.headerV1.fEpochInitLevel;
                 tagComments = new string[] { };
                 tagTimesSec = new double[] { };
+                protocolPath = abfReader.headerV1.sProtocolPath;
 
                 // DATA info
                 nDataFormat = abfReader.headerV1.nDataFormat;
@@ -106,6 +107,7 @@ namespace vsABF
                 holdingCommand = abfReader.dacSection.GetHoldByChannel();
                 tagComments = abfReader.tagSection.GetTagComments();
                 tagTimesSec = abfReader.tagSection.GetTagTimes(abfReader.protocolSection.fSynchTimeUnit/1e6);
+                protocolPath = abfReader.stringsIndexed.uProtocolPath;
 
                 // DATA info
                 nDataFormat = (short)abfReader.headerV2.nDataFormat;
@@ -119,10 +121,10 @@ namespace vsABF
                 sweepCount = (int)abfReader.headerV2.lActualEpisodes;
 
                 // channels and units (requires indexed strings)
-                adcUnits = new string[channelCount];
-                adcNames = new string[channelCount];
-                dacUnits = new string[channelCount];
-                dacNames = new string[channelCount];
+                adcUnits = abfReader.stringsIndexed.lADCUnits;
+                adcNames = abfReader.stringsIndexed.lADCChannelName;
+                dacUnits = abfReader.stringsIndexed.lDACChannelUnits;
+                dacNames = abfReader.stringsIndexed.lDACChannelName;
 
                 // determine gain and offset for each channel
                 dataGainByChannel = new double[channelCount];
@@ -159,6 +161,7 @@ namespace vsABF
             info += $"abfID = {abfID}\n";
             info += $"abfVersionMajor = {abfVersionMajor}\n";
             info += $"abfFilePath = {abfFilePath}\n";
+            info += $"protocolPath = {protocolPath}\n";
             info += $"holdingCommand = [{string.Join(", ", holdingCommand)}]\n";
             info += $"tagComments = [{string.Join(", ", tagComments)}]\n";
             info += $"tagTimesSec = [{string.Join(", ", tagTimesSec)}]\n";

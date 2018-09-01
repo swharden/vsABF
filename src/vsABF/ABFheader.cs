@@ -429,15 +429,28 @@ namespace vsABF
                 return times;
             }
         }
-
-        public class StringsSection
-        {
-            //TODO: this
-        }
-
+        
         public class StringsIndexed
         {
-            //TODO: this
+            public string[] strings;
+
+            // headerv2
+            public string uCreatorName;
+            public string uModifierName;
+            public string uProtocolPath;
+
+            // Protocol section
+            public string lFileComment;
+
+            // ADC section
+            public string[] lADCChannelName;
+            public string[] lADCUnits;
+
+            // DAC section
+            public string[] lDACChannelName;
+            public string[] lDACChannelUnits;
+            public string[] lDACFilePath;
+            public string[] nLeakSubtractADC;
         }
 
     }

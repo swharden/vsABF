@@ -44,6 +44,7 @@ namespace vsABF
                     ReadADCsection();
                     ReadDACsection();
                     ReadTagSection();
+                    ReadStringsSection();
                     break;
                 default:
                     log.Critical($"Unrecognized ABF format ({fileSignature})");
@@ -514,6 +515,48 @@ namespace vsABF
 
                 tagSection.tags[tagNumber] = thisTag;
             }
+        }
+
+
+        public StringsIndexed stringsIndexed;
+        public void ReadStringsSection()
+        {
+            log.Debug("Reading Strings Section");
+            stringsIndexed = new StringsIndexed();
+
+            // just the first string is useful
+            string s = FileReadString(sectionMap.Strings.byteStart, sectionMap.Strings.itemSize);
+            s = s.Substring(s.LastIndexOf("\x00\x00"));
+            s = s.Replace("\xb5", "\x75"); // make mu u
+            string[] strings = s.Split('\x00');
+            strings = strings.Skip(1).ToArray();
+            stringsIndexed.strings = strings;
+
+            stringsIndexed.uCreatorName = strings[headerV2.uCreatorNameIndex];
+            stringsIndexed.uModifierName = strings[headerV2.uModifierNameIndex];
+            stringsIndexed.uProtocolPath = strings[headerV2.uProtocolPathIndex];
+            stringsIndexed.lFileComment = strings[protocolSection.lFileCommentIndex];
+
+            stringsIndexed.lADCChannelName = new string[adcSection.ADCsections.Length];
+            stringsIndexed.lADCUnits = new string[adcSection.ADCsections.Length];
+            for (int i=0;i<adcSection.ADCsections.Length; i++)
+            {
+                stringsIndexed.lADCChannelName[i] = strings[adcSection.ADCsections[i].lADCChannelNameIndex];
+                stringsIndexed.lADCUnits[i] = strings[adcSection.ADCsections[i].lADCUnitsIndex];
+            }
+
+            stringsIndexed.lDACChannelName = new string[dacSection.DACsections.Length];
+            stringsIndexed.lDACChannelUnits = new string[dacSection.DACsections.Length];
+            stringsIndexed.lDACFilePath = new string[dacSection.DACsections.Length];
+            stringsIndexed.nLeakSubtractADC = new string[dacSection.DACsections.Length];
+            for (int i = 0; i < dacSection.DACsections.Length; i++)
+            {
+                stringsIndexed.lDACChannelName[i] = strings[dacSection.DACsections[i].lDACChannelNameIndex];
+                stringsIndexed.lDACChannelUnits[i] = strings[dacSection.DACsections[i].lDACChannelUnitsIndex];
+                stringsIndexed.lDACFilePath[i] = strings[dacSection.DACsections[i].lDACFilePathIndex];
+                stringsIndexed.nLeakSubtractADC[i] = strings[dacSection.DACsections[i].nLeakSubtractADCIndex];
+            }
+
         }
 
     }
