@@ -10,13 +10,7 @@ namespace vsABF
     public partial class ABF
     {
         public Logger log;
-        public ABFreader.HeaderV1 headerV1;
-        public ABFreader.HeaderV2 headerV2;
-        public ABFreader.SectionMap sectionMap;
-        public ABFreader.ProtocolSection protocolSection;
-        public ABFreader.ADCSection adcSection;
-        public ABFreader.DACSection dacSection;
-        public ABFreader.TagSection tagSection;
+        public ABFreader abfReader;
 
         // these things will be populated for every ABF (abf1 and abf2)
         public string abfFilePath;
@@ -61,27 +55,26 @@ namespace vsABF
             {
                 // pull header information locally
                 abfVersionMajor = 1;
-                headerV1 = abfReader.headerV1;
 
                 // ABF info
-                holdingCommand = headerV1.fEpochInitLevel;
+                holdingCommand = abfReader.headerV1.fEpochInitLevel;
                 tagComments = new string[] { };
                 tagTimesSec = new double[] { };
 
                 // DATA info
-                nDataFormat = headerV1.nDataFormat;
-                dataByteStart = headerV1.lDataSectionPtr * ABFreader.BLOCKSIZE + headerV1.nNumPointsIgnored;
-                dataPointCount = headerV1.lActualAcqLength;
+                nDataFormat = abfReader.headerV1.nDataFormat;
+                dataByteStart = abfReader.headerV1.lDataSectionPtr * ABFreader.BLOCKSIZE + abfReader.headerV1.nNumPointsIgnored;
+                dataPointCount = abfReader.headerV1.lActualAcqLength;
                 dataPointByteSize = 2; // ABF 1 files always have int16 points?
-                channelCount = headerV1.nADCNumChannels;
-                dataRate = (int)((double)1e6 / (double)headerV1.fADCSampleInterval);
+                channelCount = abfReader.headerV1.nADCNumChannels;
+                dataRate = (int)((double)1e6 / (double)abfReader.headerV1.fADCSampleInterval);
                 dataPointsPerMs = dataRate / 1000;
                 dataSecPerPoint = 1 / (double)dataRate;
-                sweepCount = headerV1.lActualEpisodes;
+                sweepCount = abfReader.headerV1.lActualEpisodes;
 
                 // channels and units
-                adcUnits = headerV1.sADCUnits;
-                adcNames = headerV1.sADCChannelName;
+                adcUnits = abfReader.headerV1.sADCUnits;
+                adcNames = abfReader.headerV1.sADCChannelName;
                 dacUnits = new string[channelCount];
                 dacNames = new string[channelCount];
 
@@ -91,16 +84,16 @@ namespace vsABF
                 for (int i=0; i<channelCount; i++)
                 {
                     dataGainByChannel[i] = 1;
-                    dataGainByChannel[i] /= headerV1.fInstrumentScaleFactor[i];
-                    dataGainByChannel[i] /= headerV1.fSignalGain[i];
-                    dataGainByChannel[i] /= headerV1.fADCProgrammableGain[i];
-                    if (headerV1.nTelegraphEnable[i] == 1)
-                        dataGainByChannel[i] /= headerV1.fTelegraphAdditGain[i];
-                    dataGainByChannel[i] *= headerV1.fADCRange;
-                    dataGainByChannel[i] /= headerV1.lADCResolution;
+                    dataGainByChannel[i] /= abfReader.headerV1.fInstrumentScaleFactor[i];
+                    dataGainByChannel[i] /= abfReader.headerV1.fSignalGain[i];
+                    dataGainByChannel[i] /= abfReader.headerV1.fADCProgrammableGain[i];
+                    if (abfReader.headerV1.nTelegraphEnable[i] == 1)
+                        dataGainByChannel[i] /= abfReader.headerV1.fTelegraphAdditGain[i];
+                    dataGainByChannel[i] *= abfReader.headerV1.fADCRange;
+                    dataGainByChannel[i] /= abfReader.headerV1.lADCResolution;
                     dataOffsetByChannel[i] = 0;
-                    dataOffsetByChannel[i] += headerV1.fInstrumentOffset[i];
-                    dataOffsetByChannel[i] -= headerV1.fSignalOffset[i];
+                    dataOffsetByChannel[i] += abfReader.headerV1.fInstrumentOffset[i];
+                    dataOffsetByChannel[i] -= abfReader.headerV1.fSignalOffset[i];
                 }
 
             }
@@ -108,28 +101,22 @@ namespace vsABF
             {
                 // pull header information locally
                 abfVersionMajor = 2;
-                headerV2 = abfReader.headerV2;
-                sectionMap = abfReader.sectionMap;
-                protocolSection = abfReader.protocolSection;
-                adcSection = abfReader.adcSection;
-                dacSection = abfReader.dacSection;
-                tagSection = abfReader.tagSection;
 
                 // ABF info
-                holdingCommand = dacSection.GetHoldByChannel();
-                tagComments = tagSection.GetTagComments();
-                tagTimesSec = tagSection.GetTagTimes(protocolSection.fSynchTimeUnit/1e6);
+                holdingCommand = abfReader.dacSection.GetHoldByChannel();
+                tagComments = abfReader.tagSection.GetTagComments();
+                tagTimesSec = abfReader.tagSection.GetTagTimes(abfReader.protocolSection.fSynchTimeUnit/1e6);
 
                 // DATA info
-                nDataFormat = (short)headerV2.nDataFormat;
-                dataByteStart = sectionMap.Data.byteStart;
-                dataPointCount = sectionMap.Data.itemCount;
-                dataPointByteSize = sectionMap.Data.itemSize;
-                channelCount = sectionMap.ADC.itemCount;
-                dataRate = (int)(1e6/(double)protocolSection.fADCSequenceInterval);
+                nDataFormat = (short)abfReader.headerV2.nDataFormat;
+                dataByteStart = abfReader.sectionMap.Data.byteStart;
+                dataPointCount = abfReader.sectionMap.Data.itemCount;
+                dataPointByteSize = abfReader.sectionMap.Data.itemSize;
+                channelCount = abfReader.sectionMap.ADC.itemCount;
+                dataRate = (int)(1e6/(double)abfReader.protocolSection.fADCSequenceInterval);
                 dataPointsPerMs = dataRate / 1000;
                 dataSecPerPoint = 1 / (double)dataRate;
-                sweepCount = (int)headerV2.lActualEpisodes;
+                sweepCount = (int)abfReader.headerV2.lActualEpisodes;
 
                 // channels and units (requires indexed strings)
                 adcUnits = new string[channelCount];
@@ -143,16 +130,16 @@ namespace vsABF
                 for (int i = 0; i < channelCount; i++)
                 {
                     dataGainByChannel[i] = 1;
-                    dataGainByChannel[i] /= adcSection.ADCsections[i].fInstrumentScaleFactor;
-                    dataGainByChannel[i] /= adcSection.ADCsections[i].fSignalGain;
-                    dataGainByChannel[i] /= adcSection.ADCsections[i].fADCProgrammableGain;
-                    if (adcSection.ADCsections[i].nTelegraphEnable == 1)
-                        dataGainByChannel[i] /= adcSection.ADCsections[i].fTelegraphAdditGain;
-                    dataGainByChannel[i] *= protocolSection.fADCRange;
-                    dataGainByChannel[i] /= protocolSection.lADCResolution;
+                    dataGainByChannel[i] /= abfReader.adcSection.ADCsections[i].fInstrumentScaleFactor;
+                    dataGainByChannel[i] /= abfReader.adcSection.ADCsections[i].fSignalGain;
+                    dataGainByChannel[i] /= abfReader.adcSection.ADCsections[i].fADCProgrammableGain;
+                    if (abfReader.adcSection.ADCsections[i].nTelegraphEnable == 1)
+                        dataGainByChannel[i] /= abfReader.adcSection.ADCsections[i].fTelegraphAdditGain;
+                    dataGainByChannel[i] *= abfReader.protocolSection.fADCRange;
+                    dataGainByChannel[i] /= abfReader.protocolSection.lADCResolution;
                     dataOffsetByChannel[i] = 0;
-                    dataOffsetByChannel[i] += adcSection.ADCsections[i].fInstrumentOffset;
-                    dataOffsetByChannel[i] -= adcSection.ADCsections[i].fSignalOffset;
+                    dataOffsetByChannel[i] += abfReader.adcSection.ADCsections[i].fInstrumentOffset;
+                    dataOffsetByChannel[i] -= abfReader.adcSection.ADCsections[i].fSignalOffset;
                 }
 
             } else
@@ -166,11 +153,11 @@ namespace vsABF
         /// <summary>
         /// Return just the useful bits of header common to ABF1 and ABF2 files
         /// </summary>
-        /// <returns></returns>
         public string GetAbfInfo()
         {
             string info = "";
             info += $"abfID = {abfID}\n";
+            info += $"abfVersionMajor = {abfVersionMajor}\n";
             info += $"abfFilePath = {abfFilePath}\n";
             info += $"holdingCommand = [{string.Join(", ", holdingCommand)}]\n";
             info += $"tagComments = [{string.Join(", ", tagComments)}]\n";
@@ -192,22 +179,21 @@ namespace vsABF
         /// <summary>
         /// Return EVERYTHING we got from the header.
         /// </summary>
-        /// <returns></returns>
         public string GetHeaderInfo()
         {
             string info = "";
             if (abfVersionMajor == 1)
             {
-                info += headerV1.GetInfo();
+                info += abfReader.headerV1.GetInfo();
             }
             else if (abfVersionMajor == 2)
             {
-                info += headerV2.GetInfo();
-                info += sectionMap.GetInfo();
-                info += protocolSection.GetInfo();
-                info += adcSection.GetInfo();
-                info += dacSection.GetInfo();
-                info += tagSection.GetInfo();
+                info += abfReader.headerV2.GetInfo();
+                info += abfReader.sectionMap.GetInfo();
+                info += abfReader.protocolSection.GetInfo();
+                info += abfReader.adcSection.GetInfo();
+                info += abfReader.dacSection.GetInfo();
+                info += abfReader.tagSection.GetInfo();
             }
             return info;
         }
