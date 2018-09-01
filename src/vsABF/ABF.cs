@@ -16,6 +16,7 @@ namespace vsABF
         public ABFreader.SectionMap sectionMap;
         public ABFreader.ProtocolSection protocolSection;
         public ABFreader.ADCSection adcSection;
+        public ABFreader.DACSection dacSection;
 
         public ABF(string abfFilePath)
         {
@@ -42,6 +43,7 @@ namespace vsABF
                 sectionMap = abfReader.sectionMap;
                 protocolSection = abfReader.protocolSection;
                 adcSection = abfReader.adcSection;
+                dacSection = abfReader.dacSection;
             } else
             {
                 log.Critical("Unrecognized file format");
@@ -63,6 +65,7 @@ namespace vsABF
                 info += sectionMap.GetInfo();
                 info += protocolSection.GetInfo();
                 info += adcSection.GetInfo();
+                info += dacSection.GetInfo();
             }
             return info;
         }

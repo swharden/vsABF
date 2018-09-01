@@ -40,6 +40,7 @@ namespace vsABF
                     ReadSectionMap();
                     ReadProtocolSection();
                     ReadADCsection();
+                    ReadDACsection();
                     break;
                 default:
                     log.Critical($"Unrecognized ABF format ({fileSignature})");
@@ -398,6 +399,70 @@ namespace vsABF
                 thisAdc.lADCUnitsIndex = FileReadInt(-1, 1);
 
                 adcSection.ADCsections[adcNumber] = thisAdc;
+            }
+        }
+
+
+        public DACSection dacSection;
+        public void ReadDACsection()
+        {
+            log.Debug("Reading DAC Section");
+
+            dacSection = new DACSection();
+            dacSection.DACsections = new DACSectionPerDAC[sectionMap.DAC.itemCount];
+
+            for (int dacNumber = 0; dacNumber < sectionMap.DAC.itemCount; dacNumber++)
+            {
+                log.Debug($"Reading DAC Section for DAC {dacNumber}");
+                DACSectionPerDAC thisDac = new DACSectionPerDAC();
+
+                int firstByte = sectionMap.DAC.byteStart;
+                firstByte += sectionMap.DAC.itemSize * dacNumber;
+                br.BaseStream.Seek(firstByte, SeekOrigin.Begin);
+
+                thisDac.nDACNum = FileReadShort(-1, 1);
+                thisDac.nTelegraphDACScaleFactorEnable = FileReadShort(-1, 1);
+                thisDac.fInstrumentHoldingLevel = FileReadFloat(-1, 1);
+                thisDac.fDACScaleFactor = FileReadFloat(-1, 1);
+                thisDac.fDACHoldingLevel = FileReadFloat(-1, 1);
+                thisDac.fDACCalibrationFactor = FileReadFloat(-1, 1);
+                thisDac.fDACCalibrationOffset = FileReadFloat(-1, 1);
+                thisDac.lDACChannelNameIndex = FileReadInt(-1, 1);
+                thisDac.lDACChannelUnitsIndex = FileReadInt(-1, 1);
+                thisDac.lDACFilePtr = FileReadInt(-1, 1);
+                thisDac.lDACFileNumEpisodes = FileReadInt(-1, 1);
+                thisDac.nWaveformEnable = FileReadShort(-1, 1);
+                thisDac.nWaveformSource = FileReadShort(-1, 1);
+                thisDac.nInterEpisodeLevel = FileReadShort(-1, 1);
+                thisDac.fDACFileScale = FileReadFloat(-1, 1);
+                thisDac.fDACFileOffset = FileReadFloat(-1, 1);
+                thisDac.lDACFileEpisodeNum = FileReadInt(-1, 1);
+                thisDac.nDACFileADCNum = FileReadShort(-1, 1);
+                thisDac.nConditEnable = FileReadShort(-1, 1);
+                thisDac.lConditNumPulses = FileReadInt(-1, 1);
+                thisDac.fBaselineDuration = FileReadFloat(-1, 1);
+                thisDac.fBaselineLevel = FileReadFloat(-1, 1);
+                thisDac.fStepDuration = FileReadFloat(-1, 1);
+                thisDac.fStepLevel = FileReadFloat(-1, 1);
+                thisDac.fPostTrainPeriod = FileReadFloat(-1, 1);
+                thisDac.fPostTrainLevel = FileReadFloat(-1, 1);
+                thisDac.nMembTestEnable = FileReadShort(-1, 1);
+                thisDac.nLeakSubtractType = FileReadShort(-1, 1);
+                thisDac.nPNPolarity = FileReadShort(-1, 1);
+                thisDac.fPNHoldingLevel = FileReadFloat(-1, 1);
+                thisDac.nPNNumADCChannels = FileReadShort(-1, 1);
+                thisDac.nPNPosition = FileReadShort(-1, 1);
+                thisDac.nPNNumPulses = FileReadShort(-1, 1);
+                thisDac.fPNSettlingTime = FileReadFloat(-1, 1);
+                thisDac.fPNInterpulse = FileReadFloat(-1, 1);
+                thisDac.nLTPUsageOfDAC = FileReadShort(-1, 1);
+                thisDac.nLTPPresynapticPulses = FileReadShort(-1, 1);
+                thisDac.lDACFilePathIndex = FileReadInt(-1, 1);
+                thisDac.fMembTestPreSettlingTimeMS = FileReadFloat(-1, 1);
+                thisDac.fMembTestPostSettlingTimeMS = FileReadFloat(-1, 1);
+                thisDac.nLeakSubtractADCIndex = FileReadShort(-1, 1);
+                
+                dacSection.DACsections[dacNumber] = thisDac;
             }
         }
     }

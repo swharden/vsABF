@@ -12,10 +12,6 @@ namespace vsABF
     {
         public class HeaderObject
         {
-            /// <summary>
-            /// Display text information about the current header object.
-            /// </summary>
-            /// <returns></returns>
             public string GetInfo()
             {
                 string info = $"\n### {this.GetType().Name} ###\n";
@@ -255,33 +251,33 @@ namespace vsABF
 
         public class ADCSectionByADC
         {
-            public short nADCNum; //h 0
-            public short nTelegraphEnable; //h 2
-            public short nTelegraphInstrument; //h 4
-            public float fTelegraphAdditGain; //f 6
-            public float fTelegraphFilter; //f 10
-            public float fTelegraphMembraneCap; //f 14
-            public short nTelegraphMode; //h 18
-            public float fTelegraphAccessResistance; //f 20
-            public short nADCPtoLChannelMap; //h 24
-            public short nADCSamplingSeq; //h 26
-            public float fADCProgrammableGain; //f 28
-            public float fADCDisplayAmplification; //f 32
-            public float fADCDisplayOffset; //f 36
-            public float fInstrumentScaleFactor; //f 40
-            public float fInstrumentOffset; //f 44
-            public float fSignalGain; //f 48
-            public float fSignalOffset; //f 52
-            public float fSignalLowpassFilter; //f 56
-            public float fSignalHighpassFilter; //f 60
-            public byte nLowpassFilterType; //b 64
-            public byte nHighpassFilterType; //b 65
-            public float fPostProcessLowpassFilter; //f 66
-            public byte nPostProcessLowpassFilterType; //c 70
-            public byte bEnabledDuringPN; //b 71
-            public short nStatsChannelPolarity; //h 72
-            public int lADCChannelNameIndex; //i 74
-            public int lADCUnitsIndex; //i 78
+            public short nADCNum;
+            public short nTelegraphEnable;
+            public short nTelegraphInstrument;
+            public float fTelegraphAdditGain;
+            public float fTelegraphFilter;
+            public float fTelegraphMembraneCap;
+            public short nTelegraphMode;
+            public float fTelegraphAccessResistance;
+            public short nADCPtoLChannelMap;
+            public short nADCSamplingSeq;
+            public float fADCProgrammableGain;
+            public float fADCDisplayAmplification;
+            public float fADCDisplayOffset;
+            public float fInstrumentScaleFactor;
+            public float fInstrumentOffset;
+            public float fSignalGain;
+            public float fSignalOffset;
+            public float fSignalLowpassFilter;
+            public float fSignalHighpassFilter;
+            public byte nLowpassFilterType;
+            public byte nHighpassFilterType;
+            public float fPostProcessLowpassFilter;
+            public byte nPostProcessLowpassFilterType;
+            public byte bEnabledDuringPN;
+            public short nStatsChannelPolarity;
+            public int lADCChannelNameIndex;
+            public int lADCUnitsIndex;
         }
 
         public class ADCSection
@@ -290,7 +286,7 @@ namespace vsABF
 
             public string GetInfo()
             {
-                string info = $"\n### {this.GetType().Name} ###\n";
+                string info = $"\n### ADCSection ###\n";
                 for (int adcNumber=0; adcNumber < ADCsections.Length; adcNumber++)
                 {
                     info += $"--- ADC {adcNumber} ---\n";
@@ -305,27 +301,88 @@ namespace vsABF
 
         }
 
-        public class DACSection : HeaderObject
+        public class DACSectionPerDAC
+        {
+            public short nDACNum;
+            public short nTelegraphDACScaleFactorEnable;
+            public float fInstrumentHoldingLevel;
+            public float fDACScaleFactor;
+            public float fDACHoldingLevel;
+            public float fDACCalibrationFactor;
+            public float fDACCalibrationOffset;
+            public int lDACChannelNameIndex;
+            public int lDACChannelUnitsIndex;
+            public int lDACFilePtr;
+            public int lDACFileNumEpisodes;
+            public short nWaveformEnable;
+            public short nWaveformSource;
+            public short nInterEpisodeLevel;
+            public float fDACFileScale;
+            public float fDACFileOffset;
+            public int lDACFileEpisodeNum;
+            public short nDACFileADCNum;
+            public short nConditEnable;
+            public int lConditNumPulses;
+            public float fBaselineDuration;
+            public float fBaselineLevel;
+            public float fStepDuration;
+            public float fStepLevel;
+            public float fPostTrainPeriod;
+            public float fPostTrainLevel;
+            public short nMembTestEnable;
+            public short nLeakSubtractType;
+            public short nPNPolarity;
+            public float fPNHoldingLevel;
+            public short nPNNumADCChannels;
+            public short nPNPosition;
+            public short nPNNumPulses;
+            public float fPNSettlingTime;
+            public float fPNInterpulse;
+            public short nLTPUsageOfDAC;
+            public short nLTPPresynapticPulses;
+            public int lDACFilePathIndex;
+            public float fMembTestPreSettlingTimeMS;
+            public float fMembTestPostSettlingTimeMS;
+            public short nLeakSubtractADCIndex;
+        }
+
+        public class DACSection
+        {
+            public DACSectionPerDAC[] DACsections;
+
+            public string GetInfo()
+            {
+                string info = $"\n### DACSection ###\n";
+                for (int adcNumber = 0; adcNumber < DACsections.Length; adcNumber++)
+                {
+                    info += $"--- DAC {adcNumber} ---\n";
+                    DACSectionPerDAC thisDac = DACsections[adcNumber];
+                    foreach (System.Reflection.FieldInfo x in thisDac.GetType().GetFields())
+                    {
+                        info += $"{x.Name} = {x.GetValue(thisDac).ToString()}\n";
+                    }
+                }
+                return info;
+            }
+        }
+
+        public class EpochPerDACSection
         {
         }
 
-        public class EpochPerDACSection : HeaderObject
+        public class EpochSection
         {
         }
 
-        public class EpochSection : HeaderObject
+        public class TagSection
         {
         }
 
-        public class TagSection : HeaderObject
+        public class StringsSection
         {
         }
 
-        public class StringsSection : HeaderObject
-        {
-        }
-
-        public class StringsIndexed : HeaderObject
+        public class StringsIndexed
         {
         }
 
