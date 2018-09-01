@@ -41,6 +41,7 @@ namespace vsABF
                     ReadProtocolSection();
                     ReadADCsection();
                     ReadDACsection();
+                    ReadTagSection();
                     break;
                 default:
                     log.Critical($"Unrecognized ABF format ({fileSignature})");
@@ -401,8 +402,7 @@ namespace vsABF
                 adcSection.ADCsections[adcNumber] = thisAdc;
             }
         }
-
-
+        
         public DACSection dacSection;
         public void ReadDACsection()
         {
@@ -465,5 +465,32 @@ namespace vsABF
                 dacSection.DACsections[dacNumber] = thisDac;
             }
         }
+
+        public TagSection tagSection;
+        public void ReadTagSection()
+        {
+            log.Debug("Reading Tag Section");
+            tagSection = new TagSection();
+            tagSection.tags = new TagSectionByTag[sectionMap.Tag.itemCount];
+
+            for (int tagNumber = 0; tagNumber < sectionMap.Tag.itemCount; tagNumber++)
+            {
+                log.Debug($"Reading tag Section for tag {tagNumber}");
+
+                TagSectionByTag thisTag = new TagSectionByTag();
+
+                int firstByte = sectionMap.Tag.byteStart;
+                firstByte += sectionMap.Tag.itemSize * tagNumber;
+                br.BaseStream.Seek(firstByte, SeekOrigin.Begin);
+
+                thisTag.lTagTime = FileReadInt(-1, 1);
+                thisTag.sComment = FileReadString(-1, 56);
+                thisTag.nTagType = FileReadShort(-1, 1);
+                thisTag.nVoiceTagIndex = FileReadShort(-1, 1);
+
+                tagSection.tags[tagNumber] = thisTag;
+            }
+        }
+
     }
 }

@@ -57,8 +57,7 @@ namespace testForm
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //richTextBox1.Select(10, 1);
-            listBox1.SetSelected(3, true);
+            listBox1.SetSelected(4, true);
         }
     }
 }

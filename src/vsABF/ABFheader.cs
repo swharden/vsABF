@@ -374,8 +374,29 @@ namespace vsABF
         {
         }
 
+        public class TagSectionByTag
+        {
+            public int lTagTime;
+            public string sComment;
+            public short nTagType;
+            public short nVoiceTagIndex;
+        }
+
         public class TagSection
         {
+            public TagSectionByTag[] tags;
+
+            public string GetInfo()
+            {
+                string info = $"\n### Tags ###\n";
+                for (int tagNumber=0; tagNumber<tags.Length; tagNumber++)
+                {
+                    TagSectionByTag tag = tags[tagNumber];
+                    info += $"Tag at {tag.lTagTime} says [{tag.sComment}]\n";
+                    //info += "tag\n";
+                }
+                return info;
+            }
         }
 
         public class StringsSection
