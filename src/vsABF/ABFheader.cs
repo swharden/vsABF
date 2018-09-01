@@ -170,17 +170,8 @@ namespace vsABF
                 foreach (System.Reflection.FieldInfo x in this.GetType().GetFields())
                 {
                     System.Object val = x.GetValue(this);
-
-                    if (val == null)
-                    {
-                        info += $"{x.Name} = null\n";
-                    } else
-                    {
-                        Section sec = (Section)val;
-                        //info += $"{x.Name} = first byte {sec.byteStart}, item size {sec.itemSize} bytes, item count {sec.itemCount}\n";
-                        info += $"{x.Name} = {sec.itemCount} items ({sec.itemSize} bytes each) at byte {sec.byteStart}\n";
-                    }
-
+                    Section sec = (Section)val;
+                    info += $"{x.Name} = {sec.itemCount} items ({sec.itemSize} bytes each) at byte {sec.byteStart}\n";
                 }
                 return info;
             }
@@ -262,8 +253,56 @@ namespace vsABF
             public short nDigitizerType;
         }
 
-        public class ADCSection : HeaderObject
+        public class ADCSectionByADC
         {
+            public short nADCNum; //h 0
+            public short nTelegraphEnable; //h 2
+            public short nTelegraphInstrument; //h 4
+            public float fTelegraphAdditGain; //f 6
+            public float fTelegraphFilter; //f 10
+            public float fTelegraphMembraneCap; //f 14
+            public short nTelegraphMode; //h 18
+            public float fTelegraphAccessResistance; //f 20
+            public short nADCPtoLChannelMap; //h 24
+            public short nADCSamplingSeq; //h 26
+            public float fADCProgrammableGain; //f 28
+            public float fADCDisplayAmplification; //f 32
+            public float fADCDisplayOffset; //f 36
+            public float fInstrumentScaleFactor; //f 40
+            public float fInstrumentOffset; //f 44
+            public float fSignalGain; //f 48
+            public float fSignalOffset; //f 52
+            public float fSignalLowpassFilter; //f 56
+            public float fSignalHighpassFilter; //f 60
+            public byte nLowpassFilterType; //b 64
+            public byte nHighpassFilterType; //b 65
+            public float fPostProcessLowpassFilter; //f 66
+            public byte nPostProcessLowpassFilterType; //c 70
+            public byte bEnabledDuringPN; //b 71
+            public short nStatsChannelPolarity; //h 72
+            public int lADCChannelNameIndex; //i 74
+            public int lADCUnitsIndex; //i 78
+        }
+
+        public class ADCSection
+        {
+            public ADCSectionByADC[] ADCsections;
+
+            public string GetInfo()
+            {
+                string info = $"\n### {this.GetType().Name} ###\n";
+                for (int adcNumber=0; adcNumber < ADCsections.Length; adcNumber++)
+                {
+                    info += $"--- ADC {adcNumber} ---\n";
+                    ADCSectionByADC thisAdc = ADCsections[adcNumber];
+                    foreach (System.Reflection.FieldInfo x in thisAdc.GetType().GetFields())
+                    {
+                        info += $"{x.Name} = {x.GetValue(thisAdc).ToString()}\n";
+                    }
+                }
+                return info;
+            }
+
         }
 
         public class DACSection : HeaderObject

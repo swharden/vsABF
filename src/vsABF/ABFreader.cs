@@ -39,6 +39,7 @@ namespace vsABF
                     ReadHeaderV2();
                     ReadSectionMap();
                     ReadProtocolSection();
+                    ReadADCsection();
                     break;
                 default:
                     log.Critical($"Unrecognized ABF format ({fileSignature})");
@@ -87,7 +88,7 @@ namespace vsABF
                 br.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
             return System.Text.Encoding.Default.GetString(br.ReadBytes(count));
         }
-        
+
         public short FileReadShort(int bytePosition, int count)
         {
             if (bytePosition >= 0)
@@ -349,6 +350,55 @@ namespace vsABF
             protocolSection.nDigitizerTotalDigitalOuts = FileReadShort(-1, 1);
             protocolSection.nDigitizerSynchDigitalOuts = FileReadShort(-1, 1);
             protocolSection.nDigitizerType = FileReadShort(-1, 1);
+        }
+
+        public ADCSection adcSection;
+        public void ReadADCsection()
+        {
+            log.Debug("Reading ADC Section");
+
+            adcSection = new ADCSection();
+            adcSection.ADCsections = new ADCSectionByADC[sectionMap.ADC.itemCount];
+
+            for (int adcNumber= 0; adcNumber<sectionMap.ADC.itemCount; adcNumber++)
+            {
+                log.Debug($"Reading ADC Section for ADC {adcNumber}");
+                ADCSectionByADC thisAdc = new ADCSectionByADC();
+
+                int firstByte = sectionMap.ADC.byteStart;
+                firstByte += sectionMap.ADC.itemSize*adcNumber;
+                br.BaseStream.Seek(firstByte, SeekOrigin.Begin);
+
+                thisAdc.nADCNum = FileReadShort(-1, 1);
+                thisAdc.nTelegraphEnable = FileReadShort(-1, 1);
+                thisAdc.nTelegraphInstrument = FileReadShort(-1, 1);
+                thisAdc.fTelegraphAdditGain = FileReadFloat(-1, 1);
+                thisAdc.fTelegraphFilter = FileReadFloat(-1, 1);
+                thisAdc.fTelegraphMembraneCap = FileReadFloat(-1, 1);
+                thisAdc.nTelegraphMode = FileReadShort(-1, 1);
+                thisAdc.fTelegraphAccessResistance = FileReadFloat(-1, 1);
+                thisAdc.nADCPtoLChannelMap = FileReadShort(-1, 1);
+                thisAdc.nADCSamplingSeq = FileReadShort(-1, 1);
+                thisAdc.fADCProgrammableGain = FileReadFloat(-1, 1);
+                thisAdc.fADCDisplayAmplification = FileReadFloat(-1, 1);
+                thisAdc.fADCDisplayOffset = FileReadFloat(-1, 1);
+                thisAdc.fInstrumentScaleFactor = FileReadFloat(-1, 1);
+                thisAdc.fInstrumentOffset = FileReadFloat(-1, 1);
+                thisAdc.fSignalGain = FileReadFloat(-1, 1);
+                thisAdc.fSignalOffset = FileReadFloat(-1, 1);
+                thisAdc.fSignalLowpassFilter = FileReadFloat(-1, 1);
+                thisAdc.fSignalHighpassFilter = FileReadFloat(-1, 1);
+                thisAdc.nLowpassFilterType = FileReadByte(-1, 1);
+                thisAdc.nHighpassFilterType = FileReadByte(-1, 1);
+                thisAdc.fPostProcessLowpassFilter = FileReadFloat(-1, 1);
+                thisAdc.nPostProcessLowpassFilterType = FileReadByte(-1, 1);
+                thisAdc.bEnabledDuringPN = FileReadByte(-1, 1);
+                thisAdc.nStatsChannelPolarity = FileReadShort(-1, 1);
+                thisAdc.lADCChannelNameIndex = FileReadInt(-1, 1);
+                thisAdc.lADCUnitsIndex = FileReadInt(-1, 1);
+
+                adcSection.ADCsections[adcNumber] = thisAdc;
+            }
         }
     }
 }
