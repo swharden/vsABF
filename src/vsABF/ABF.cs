@@ -13,6 +13,7 @@ namespace vsABF
         public int abfVersionMajor = 0;
         public ABFreader.HeaderV1 headerV1;
         public ABFreader.HeaderV2 headerV2;
+        public ABFreader.SectionMap sectionMap;
 
         public ABF(string abfFilePath)
         {
@@ -36,6 +37,7 @@ namespace vsABF
             {
                 abfVersionMajor = 2;
                 headerV2 = abfReader.headerV2;
+                sectionMap = abfReader.sectionMap;
             } else
             {
                 log.Critical("Unrecognized file format");
@@ -46,11 +48,17 @@ namespace vsABF
 
         public string GetHeaderInfo()
         {
+            string info = "";
             if (abfVersionMajor == 1)
-                return headerV1.GetInfo();
-            if (abfVersionMajor == 2)
-                return headerV2.GetInfo();
-            return "asdf";
+            {
+                info += headerV1.GetInfo();
+            }
+            else if (abfVersionMajor == 2)
+            {
+                info += headerV2.GetInfo();
+                info += sectionMap.GetInfo();
+            }
+            return info;
         }
 
 

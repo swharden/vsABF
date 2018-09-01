@@ -37,6 +37,7 @@ namespace vsABF
                 case "ABF2":
                     log.Debug("File is in ABF2 format");
                     ReadHeaderV2();
+                    ReadSectionMap();
                     break;
                 default:
                     log.Critical($"Unrecognized ABF format ({fileSignature})");
@@ -118,6 +119,16 @@ namespace vsABF
             if (bytePosition >= 0)
                 br.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
             return BitConverter.ToUInt32(br.ReadBytes(4), 0);
+        }
+
+        public uint[] FileReadUnsignedInts(int bytePosition, int count)
+        {
+            if (bytePosition >= 0)
+                br.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
+            uint[] vals = new uint[count];
+            for (int i = 0; i < count; i++)
+                vals[i] = BitConverter.ToUInt32(br.ReadBytes(4), 0);
+            return vals;
         }
 
         public float FileReadFloat(int bytePosition, int count)
@@ -219,6 +230,33 @@ namespace vsABF
             headerV2.uModifierVersion = FileReadUnsignedInt(-1, 1); //I;
             headerV2.uModifierNameIndex = FileReadUnsignedInt(-1, 1); //I;
             headerV2.uProtocolPathIndex = FileReadUnsignedInt(-1, 1); //I;
+        }
+
+        public SectionMap sectionMap;
+        public void ReadSectionMap()
+        {
+            log.Debug("Reading ABF Section Map");
+            sectionMap = new SectionMap();
+            sectionMap.Protocol = new Section(FileReadUnsignedInts(76, 3));
+            sectionMap.ADC = new Section(FileReadUnsignedInts(92, 3));
+            sectionMap.DAC = new Section(FileReadUnsignedInts(108, 3));
+            sectionMap.Epoch = new Section(FileReadUnsignedInts(124, 3));
+            sectionMap.ADCPerDAC = new Section(FileReadUnsignedInts(140, 3));
+            sectionMap.EpochPerDAC = new Section(FileReadUnsignedInts(156, 3));
+            sectionMap.UserList = new Section(FileReadUnsignedInts(172, 3));
+            sectionMap.StatsRegion = new Section(FileReadUnsignedInts(188, 3));
+            sectionMap.Math = new Section(FileReadUnsignedInts(204, 3));
+            sectionMap.Strings = new Section(FileReadUnsignedInts(220, 3));
+            sectionMap.Data = new Section(FileReadUnsignedInts(236, 3));
+            sectionMap.Tag = new Section(FileReadUnsignedInts(252, 3));
+            sectionMap.Scope = new Section(FileReadUnsignedInts(268, 3));
+            sectionMap.Delta = new Section(FileReadUnsignedInts(284, 3));
+            sectionMap.VoiceTag = new Section(FileReadUnsignedInts(300, 3));
+            sectionMap.SynchArray = new Section(FileReadUnsignedInts(316, 3));
+            sectionMap.Annotation = new Section(FileReadUnsignedInts(332, 3));
+            sectionMap.Stats = new Section(FileReadUnsignedInts(348, 3));
+
+
         }
     }
 }

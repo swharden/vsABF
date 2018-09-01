@@ -12,6 +12,10 @@ namespace vsABF
     {
         public class HeaderObject
         {
+            /// <summary>
+            /// Display text information about the current header object.
+            /// </summary>
+            /// <returns></returns>
             public string GetInfo()
             {
                 string info = $"\n### {this.GetType().Name} ###\n";
@@ -19,21 +23,29 @@ namespace vsABF
                 {
                     System.Object val = x.GetValue(this);
 
-                    string valStr = "";
-                    if (val.GetType().IsArray)
+                    if (val == null)
                     {
-                        Array objects = (Array)val;
-                        string[] strings = new string[objects.GetUpperBound(0)];
-                        for(int i=0; i<strings.Length; i++)
-                        {
-                            strings[i] += objects.GetValue(i).ToString();
-                        }
-                        valStr += "["+string.Join(", ", strings.ToArray()) +"]";
-                    } else
-                    {
-                        valStr = val.ToString();
+                        info += $"{x.Name} = null\n";
                     }
-                    info += $"{x.Name} = {valStr}\n";
+                    else
+                    {
+                        string valStr = "";
+                        if (val.GetType().IsArray)
+                        {
+                            Array objects = (Array)val;
+                            string[] strings = new string[objects.GetUpperBound(0)];
+                            for (int i = 0; i < strings.Length; i++)
+                            {
+                                strings[i] += objects.GetValue(i).ToString();
+                            }
+                            valStr += "[" + string.Join(", ", strings.ToArray()) + "]";
+                        }
+                        else
+                        {
+                            valStr = val.ToString();
+                        }
+                        info += $"{x.Name} = {valStr}\n";
+                    }
                 }
                 return info;
             }
@@ -116,8 +128,61 @@ namespace vsABF
             public uint uProtocolPathIndex;
         }
 
-        public class SectionMap : HeaderObject
+        public class Section
         {
+            private int BLOCKSIZE = 512;
+            public int blockStart;
+            public int byteStart { get { return BLOCKSIZE * blockStart; }  }
+            public int itemSize;
+            public int itemCount;
+            public Section(uint[] ints)
+            {
+                blockStart = (int)ints[0];
+                itemSize = (int)ints[1];
+                itemCount = (int)ints[2];
+            }
+        }
+
+        public class SectionMap
+        {
+            public Section Protocol;
+            public Section ADC;
+            public Section DAC;
+            public Section Epoch;
+            public Section ADCPerDAC;
+            public Section EpochPerDAC;
+            public Section UserList;
+            public Section StatsRegion;
+            public Section Math;
+            public Section Strings;
+            public Section Data;
+            public Section Tag;
+            public Section Scope;
+            public Section Delta;
+            public Section VoiceTag;
+            public Section SynchArray;
+            public Section Annotation;
+            public Section Stats;
+
+            public string GetInfo()
+            {
+                string info = $"\n### {this.GetType().Name} ###\n";
+                foreach (System.Reflection.FieldInfo x in this.GetType().GetFields())
+                {
+                    System.Object val = x.GetValue(this);
+
+                    if (val == null)
+                    {
+                        info += $"{x.Name} = null\n";
+                    } else
+                    {
+                        Section sec = (Section)val;
+                        info += $"{x.Name} = first byte {sec.byteStart}, item size {sec.itemSize} bytes, item count {sec.itemCount}\n";
+                    }
+
+                }
+                return info;
+            }
         }
 
         public class ProtocolSection : HeaderObject
