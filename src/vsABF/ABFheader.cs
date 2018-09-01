@@ -73,8 +73,8 @@ namespace vsABF
             public short nFileStartMillisecs;
             public short[] nADCPtoLChannelMap;
             public short[] nADCSamplingSeq;
-            public string sADCChannelName;
-            public string sADCUnits;
+            public string[] sADCChannelName;
+            public string[] sADCUnits;
             public float[] fADCProgrammableGain;
             public float[] fInstrumentScaleFactor;
             public float[] fInstrumentOffset;
@@ -364,14 +364,26 @@ namespace vsABF
                 }
                 return info;
             }
+
+            public float[] GetHoldByChannel()
+            {
+                float[] commands = new float[DACsections.Length];
+                for (int i=0; i< DACsections.Length; i++)
+                {
+                    commands[i] = DACsections[i].fDACHoldingLevel;
+                }
+                return commands;
+            }
         }
 
         public class EpochPerDACSection
         {
+            //TODO: this
         }
 
         public class EpochSection
         {
+            //TODO: this
         }
 
         public class TagSectionByTag
@@ -393,18 +405,39 @@ namespace vsABF
                 {
                     TagSectionByTag tag = tags[tagNumber];
                     info += $"Tag at {tag.lTagTime} says [{tag.sComment}]\n";
-                    //info += "tag\n";
                 }
                 return info;
+            }
+
+            public string[] GetTagComments()
+            {
+                string[] comments = new string[tags.Length];
+                for (int i=0; i<tags.Length; i++)
+                {
+                    comments[i] = tags[i].sComment;
+                }
+                return comments;
+            }
+
+            public double[] GetTagTimes(double tagMult =1)
+            {
+                double[] times = new double[tags.Length];
+                for (int i = 0; i < tags.Length; i++)
+                {
+                    times[i] = (double)(tags[i].lTagTime*tagMult);
+                }
+                return times;
             }
         }
 
         public class StringsSection
         {
+            //TODO: this
         }
 
         public class StringsIndexed
         {
+            //TODO: this
         }
 
     }

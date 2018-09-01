@@ -15,6 +15,8 @@ namespace vsABF
         public string abfFilePath;
         public string fileSignature;
 
+        public const int BLOCKSIZE = 512;
+
         /// <summary>
         /// The ABFreader object reads an ABF file and populates each of the applicable header sections.
         /// It does not try to unify variables to a common naming system across ABF versions.
@@ -89,6 +91,18 @@ namespace vsABF
             if (bytePosition >= 0)
                 br.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
             return System.Text.Encoding.Default.GetString(br.ReadBytes(count));
+        }
+
+        public string[] FileReadStrings(int bytePosition, int charCount, int stringCount)
+        {
+            if (bytePosition >= 0)
+                br.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
+            string[] s = new string[stringCount];
+            for (int i=0; i<stringCount; i++)
+            {
+                s[i] = System.Text.Encoding.Default.GetString(br.ReadBytes(charCount));
+            }
+            return s;
         }
 
         public short FileReadShort(int bytePosition, int count)
@@ -195,8 +209,8 @@ namespace vsABF
             headerV1.nFileStartMillisecs = FileReadShort(366, 1); //h;
             headerV1.nADCPtoLChannelMap = FileReadShorts(378, 16); //16h;
             headerV1.nADCSamplingSeq = FileReadShorts(410, 16); //16h;
-            headerV1.sADCChannelName = FileReadString(442, 10); //10s;
-            headerV1.sADCUnits = FileReadString(602, 8); //8s;
+            headerV1.sADCChannelName = FileReadStrings(442, 10, 16); //10s;
+            headerV1.sADCUnits = FileReadStrings(602, 8, 16); //8s;
             headerV1.fADCProgrammableGain = FileReadFloats(730, 16); //16f;
             headerV1.fInstrumentScaleFactor = FileReadFloats(922, 16); //16f;
             headerV1.fInstrumentOffset = FileReadFloats(986, 16); //16f;
@@ -222,6 +236,16 @@ namespace vsABF
             headerV1.nTelegraphEnable = FileReadShorts(4512, 16); //16h;
             headerV1.fTelegraphAdditGain = FileReadFloats(4576, 16); //16f;
             headerV1.sProtocolPath = FileReadString(4898, 384); //384s;
+
+            // clean up adc and dac units
+            for (int i=0; i<headerV1.sADCUnits.Length; i++)
+            {
+                headerV1.sADCUnits[i] = headerV1.sADCUnits[i].Trim();
+            }
+            for (int i = 0; i < headerV1.sADCChannelName.Length; i++)
+            {
+                headerV1.sADCChannelName[i] = headerV1.sADCChannelName[i].Trim();
+            }
         }
 
         public HeaderV2 headerV2;
@@ -484,7 +508,7 @@ namespace vsABF
                 br.BaseStream.Seek(firstByte, SeekOrigin.Begin);
 
                 thisTag.lTagTime = FileReadInt(-1, 1);
-                thisTag.sComment = FileReadString(-1, 56);
+                thisTag.sComment = FileReadString(-1, 56).Trim();
                 thisTag.nTagType = FileReadShort(-1, 1);
                 thisTag.nVoiceTagIndex = FileReadShort(-1, 1);
 
