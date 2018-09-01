@@ -38,6 +38,7 @@ namespace vsABF
                     log.Debug("File is in ABF2 format");
                     ReadHeaderV2();
                     ReadSectionMap();
+                    ReadProtocolSection();
                     break;
                 default:
                     log.Critical($"Unrecognized ABF format ({fileSignature})");
@@ -66,13 +67,27 @@ namespace vsABF
             return br.ReadBytes(count);
         }
 
+        public char FileReadChar(int bytePosition, int count)
+        {
+            if (bytePosition >= 0)
+                br.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
+            return br.ReadChar();
+        }
+
+        public byte FileReadByte(int bytePosition, int count)
+        {
+            if (bytePosition >= 0)
+                br.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
+            return br.ReadByte();
+        }
+
         public string FileReadString(int bytePosition, int count)
         {
             if (bytePosition >= 0)
                 br.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
             return System.Text.Encoding.Default.GetString(br.ReadBytes(count));
         }
-
+        
         public short FileReadShort(int bytePosition, int count)
         {
             if (bytePosition >= 0)
@@ -235,7 +250,7 @@ namespace vsABF
         public SectionMap sectionMap;
         public void ReadSectionMap()
         {
-            log.Debug("Reading ABF Section Map");
+            log.Debug("Reading Section Map");
             sectionMap = new SectionMap();
             sectionMap.Protocol = new Section(FileReadUnsignedInts(76, 3));
             sectionMap.ADC = new Section(FileReadUnsignedInts(92, 3));
@@ -255,8 +270,85 @@ namespace vsABF
             sectionMap.SynchArray = new Section(FileReadUnsignedInts(316, 3));
             sectionMap.Annotation = new Section(FileReadUnsignedInts(332, 3));
             sectionMap.Stats = new Section(FileReadUnsignedInts(348, 3));
+        }
 
-
+        public ProtocolSection protocolSection;
+        public void ReadProtocolSection()
+        {
+            log.Debug("Reading Protocol Section");
+            br.BaseStream.Seek(sectionMap.Protocol.byteStart, SeekOrigin.Begin);
+            protocolSection = new ProtocolSection();
+            protocolSection.nOperationMode = FileReadShort(-1, 1);
+            protocolSection.fADCSequenceInterval = FileReadFloat(-1, 1);
+            protocolSection.bEnableFileCompression = FileReadByte(-1, 1);
+            protocolSection.sUnused = FileReadBytes(-1, 3);
+            protocolSection.uFileCompressionRatio = FileReadUnsignedInt(-1, 1);
+            protocolSection.fSynchTimeUnit = FileReadFloat(-1, 1);
+            protocolSection.fSecondsPerRun = FileReadFloat(-1, 1);
+            protocolSection.lNumSamplesPerEpisode = FileReadInt(-1, 1);
+            protocolSection.lPreTriggerSamples = FileReadInt(-1, 1);
+            protocolSection.lEpisodesPerRun = FileReadInt(-1, 1);
+            protocolSection.lRunsPerTrial = FileReadInt(-1, 1);
+            protocolSection.lNumberOfTrials = FileReadInt(-1, 1);
+            protocolSection.nAveragingMode = FileReadShort(-1, 1);
+            protocolSection.nUndoRunCount = FileReadShort(-1, 1);
+            protocolSection.nFirstEpisodeInRun = FileReadShort(-1, 1);
+            protocolSection.fTriggerThreshold = FileReadFloat(-1, 1);
+            protocolSection.nTriggerSource = FileReadShort(-1, 1);
+            protocolSection.nTriggerAction = FileReadShort(-1, 1);
+            protocolSection.nTriggerPolarity = FileReadShort(-1, 1);
+            protocolSection.fScopeOutputInterval = FileReadFloat(-1, 1);
+            protocolSection.fEpisodeStartToStart = FileReadFloat(-1, 1);
+            protocolSection.fRunStartToStart = FileReadFloat(-1, 1);
+            protocolSection.lAverageCount = FileReadInt(-1, 1);
+            protocolSection.fTrialStartToStart = FileReadFloat(-1, 1);
+            protocolSection.nAutoTriggerStrategy = FileReadShort(-1, 1);
+            protocolSection.fFirstRunDelayS = FileReadFloat(-1, 1);
+            protocolSection.nChannelStatsStrategy = FileReadShort(-1, 1);
+            protocolSection.lSamplesPerTrace = FileReadInt(-1, 1);
+            protocolSection.lStartDisplayNum = FileReadInt(-1, 1);
+            protocolSection.lFinishDisplayNum = FileReadInt(-1, 1);
+            protocolSection.nShowPNRawData = FileReadShort(-1, 1);
+            protocolSection.fStatisticsPeriod = FileReadFloat(-1, 1);
+            protocolSection.lStatisticsMeasurements = FileReadInt(-1, 1);
+            protocolSection.nStatisticsSaveStrategy = FileReadShort(-1, 1);
+            protocolSection.fADCRange = FileReadFloat(-1, 1);
+            protocolSection.fDACRange = FileReadFloat(-1, 1);
+            protocolSection.lADCResolution = FileReadInt(-1, 1);
+            protocolSection.lDACResolution = FileReadInt(-1, 1);
+            protocolSection.nExperimentType = FileReadShort(-1, 1);
+            protocolSection.nManualInfoStrategy = FileReadShort(-1, 1);
+            protocolSection.nCommentsEnable = FileReadShort(-1, 1);
+            protocolSection.lFileCommentIndex = FileReadInt(-1, 1);
+            protocolSection.nAutoAnalyseEnable = FileReadShort(-1, 1);
+            protocolSection.nSignalType = FileReadShort(-1, 1);
+            protocolSection.nDigitalEnable = FileReadShort(-1, 1);
+            protocolSection.nActiveDACChannel = FileReadShort(-1, 1);
+            protocolSection.nDigitalHolding = FileReadShort(-1, 1);
+            protocolSection.nDigitalInterEpisode = FileReadShort(-1, 1);
+            protocolSection.nDigitalDACChannel = FileReadShort(-1, 1);
+            protocolSection.nDigitalTrainActiveLogic = FileReadShort(-1, 1);
+            protocolSection.nStatsEnable = FileReadShort(-1, 1);
+            protocolSection.nStatisticsClearStrategy = FileReadShort(-1, 1);
+            protocolSection.nLevelHysteresis = FileReadShort(-1, 1);
+            protocolSection.lTimeHysteresis = FileReadInt(-1, 1);
+            protocolSection.nAllowExternalTags = FileReadShort(-1, 1);
+            protocolSection.nAverageAlgorithm = FileReadShort(-1, 1);
+            protocolSection.fAverageWeighting = FileReadFloat(-1, 1);
+            protocolSection.nUndoPromptStrategy = FileReadShort(-1, 1);
+            protocolSection.nTrialTriggerSource = FileReadShort(-1, 1);
+            protocolSection.nStatisticsDisplayStrategy = FileReadShort(-1, 1);
+            protocolSection.nExternalTagType = FileReadShort(-1, 1);
+            protocolSection.nScopeTriggerOut = FileReadShort(-1, 1);
+            protocolSection.nLTPType = FileReadShort(-1, 1);
+            protocolSection.nAlternateDACOutputState = FileReadShort(-1, 1);
+            protocolSection.nAlternateDigitalOutputState = FileReadShort(-1, 1);
+            protocolSection.fCellID = FileReadFloats(-1, 3);
+            protocolSection.nDigitizerADCs = FileReadShort(-1, 1);
+            protocolSection.nDigitizerDACs = FileReadShort(-1, 1);
+            protocolSection.nDigitizerTotalDigitalOuts = FileReadShort(-1, 1);
+            protocolSection.nDigitizerSynchDigitalOuts = FileReadShort(-1, 1);
+            protocolSection.nDigitizerType = FileReadShort(-1, 1);
         }
     }
 }

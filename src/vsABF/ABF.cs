@@ -14,6 +14,7 @@ namespace vsABF
         public ABFreader.HeaderV1 headerV1;
         public ABFreader.HeaderV2 headerV2;
         public ABFreader.SectionMap sectionMap;
+        public ABFreader.ProtocolSection protocolSection;
 
         public ABF(string abfFilePath)
         {
@@ -38,6 +39,7 @@ namespace vsABF
                 abfVersionMajor = 2;
                 headerV2 = abfReader.headerV2;
                 sectionMap = abfReader.sectionMap;
+                protocolSection = abfReader.protocolSection;
             } else
             {
                 log.Critical("Unrecognized file format");
@@ -57,6 +59,7 @@ namespace vsABF
             {
                 info += headerV2.GetInfo();
                 info += sectionMap.GetInfo();
+                info += protocolSection.GetInfo();
             }
             return info;
         }

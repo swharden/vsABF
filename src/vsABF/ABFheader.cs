@@ -177,7 +177,8 @@ namespace vsABF
                     } else
                     {
                         Section sec = (Section)val;
-                        info += $"{x.Name} = first byte {sec.byteStart}, item size {sec.itemSize} bytes, item count {sec.itemCount}\n";
+                        //info += $"{x.Name} = first byte {sec.byteStart}, item size {sec.itemSize} bytes, item count {sec.itemCount}\n";
+                        info += $"{x.Name} = {sec.itemCount} items ({sec.itemSize} bytes each) at byte {sec.byteStart}\n";
                     }
 
                 }
@@ -187,6 +188,78 @@ namespace vsABF
 
         public class ProtocolSection : HeaderObject
         {
+            //ProtocolSection
+            public short nOperationMode;
+            public float fADCSequenceInterval;
+            public byte bEnableFileCompression;
+            public byte[] sUnused;
+            public uint uFileCompressionRatio;
+            public float fSynchTimeUnit;
+            public float fSecondsPerRun;
+            public int lNumSamplesPerEpisode;
+            public int lPreTriggerSamples;
+            public int lEpisodesPerRun;
+            public int lRunsPerTrial;
+            public int lNumberOfTrials;
+            public short nAveragingMode;
+            public short nUndoRunCount;
+            public short nFirstEpisodeInRun;
+            public float fTriggerThreshold;
+            public short nTriggerSource;
+            public short nTriggerAction;
+            public short nTriggerPolarity;
+            public float fScopeOutputInterval;
+            public float fEpisodeStartToStart;
+            public float fRunStartToStart;
+            public int lAverageCount;
+            public float fTrialStartToStart;
+            public short nAutoTriggerStrategy;
+            public float fFirstRunDelayS;
+            public short nChannelStatsStrategy;
+            public int lSamplesPerTrace;
+            public int lStartDisplayNum;
+            public int lFinishDisplayNum;
+            public short nShowPNRawData;
+            public float fStatisticsPeriod;
+            public int lStatisticsMeasurements;
+            public short nStatisticsSaveStrategy;
+            public float fADCRange;
+            public float fDACRange;
+            public int lADCResolution;
+            public int lDACResolution;
+            public short nExperimentType;
+            public short nManualInfoStrategy;
+            public short nCommentsEnable;
+            public int lFileCommentIndex;
+            public short nAutoAnalyseEnable;
+            public short nSignalType;
+            public short nDigitalEnable;
+            public short nActiveDACChannel;
+            public short nDigitalHolding;
+            public short nDigitalInterEpisode;
+            public short nDigitalDACChannel;
+            public short nDigitalTrainActiveLogic;
+            public short nStatsEnable;
+            public short nStatisticsClearStrategy;
+            public short nLevelHysteresis;
+            public int lTimeHysteresis;
+            public short nAllowExternalTags;
+            public short nAverageAlgorithm;
+            public float fAverageWeighting;
+            public short nUndoPromptStrategy;
+            public short nTrialTriggerSource;
+            public short nStatisticsDisplayStrategy;
+            public short nExternalTagType;
+            public short nScopeTriggerOut;
+            public short nLTPType;
+            public short nAlternateDACOutputState;
+            public short nAlternateDigitalOutputState;
+            public float[] fCellID;
+            public short nDigitizerADCs;
+            public short nDigitizerDACs;
+            public short nDigitizerTotalDigitalOuts;
+            public short nDigitizerSynchDigitalOuts;
+            public short nDigitizerType;
         }
 
         public class ADCSection : HeaderObject
