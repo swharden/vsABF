@@ -10,11 +10,19 @@ using System.Windows.Forms;
 using vsABF;
 using System.IO;
 
-namespace testForm
+namespace abfViewer
 {
     public partial class Form1 : Form
     {
-        Logger log;
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            ScanAbfFolder(@"C:\Users\scott\Documents\GitHub\pyABF\data\abfs");
+        }
 
         private class AbfPath
         {
@@ -25,34 +33,30 @@ namespace testForm
 
         private List<AbfPath> abfPaths = new List<AbfPath>();
 
-        public Form1()
-        {
-            InitializeComponent();
-            log = new Logger("Form");
-            ScanAbfFolder(@"C:\Users\scott\Documents\GitHub\pyABF\data\abfs");
-        }
-
         public void ScanAbfFolder(string abfFolder)
         {
             abfPaths.Clear();
             foreach (string abfFilePath in System.IO.Directory.GetFiles(abfFolder, "*.abf"))
             {
-                AbfPath abfPath = new AbfPath() {
+                AbfPath abfPath = new AbfPath()
+                {
                     abfPath = abfFilePath,
                     abfFileName = Path.GetFileName(abfFilePath),
-                    abfID = Path.GetFileNameWithoutExtension(abfFilePath) };
+                    abfID = Path.GetFileNameWithoutExtension(abfFilePath)
+                };
                 abfPaths.Add(abfPath);
             }
             listBox1.DisplayMember = "abfID";
             listBox1.ValueMember = "abfPath";
             listBox1.DataSource = abfPaths;
         }
-
+        
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            richTextBox1.Clear();
             ABF abf = new ABF(listBox1.SelectedValue.ToString());
-            richTextBox1.Text = abf.GetAbfInfo();
+            scottPlotUC1.Clear();
+            scottPlotUC1.PlotSignal(abf.sweepY, abf.dataRate);
+            scottPlotUC1.AxisAuto();
         }
     }
 }

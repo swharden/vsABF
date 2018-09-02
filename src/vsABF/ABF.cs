@@ -28,6 +28,7 @@ namespace vsABF
         public double dataSecPerPoint;
         public int dataPointsPerMs;
         public int sweepCount;
+        public int sweepPointCount;
         public string[] adcUnits;
         public string[] adcNames;
         public string[] dacUnits;
@@ -36,7 +37,7 @@ namespace vsABF
         public double[] dataOffsetByChannel;
         public string protocolPath;
 
-        public ABF(string abfFilePath)
+        public ABF(string abfFilePath, bool preLoadData = true)
         {
             // set up our logger, paths, and ensure file exists
             log = new Logger("ABF");
@@ -72,6 +73,8 @@ namespace vsABF
                 dataPointsPerMs = dataRate / 1000;
                 dataSecPerPoint = 1 / (double)dataRate;
                 sweepCount = abfReader.headerV1.lActualEpisodes;
+                if (sweepCount == 0) sweepCount = 1;
+                sweepPointCount = dataPointCount / sweepCount / channelCount;
 
                 // channels and units
                 adcUnits = abfReader.headerV1.sADCUnits;
@@ -119,6 +122,8 @@ namespace vsABF
                 dataPointsPerMs = dataRate / 1000;
                 dataSecPerPoint = 1 / (double)dataRate;
                 sweepCount = (int)abfReader.headerV2.lActualEpisodes;
+                if (sweepCount == 0) sweepCount = 1;
+                sweepPointCount = dataPointCount / sweepCount / channelCount;
 
                 // channels and units (requires indexed strings)
                 adcUnits = abfReader.stringsIndexed.lADCUnits;
@@ -148,7 +153,13 @@ namespace vsABF
             {
                 log.Critical("Unrecognized file format");
                 return;
-            }           
+            }
+
+            if (preLoadData)
+            {
+                LoadData();
+                SetSweep();
+            }
 
         }
 
@@ -200,6 +211,55 @@ namespace vsABF
             }
             return info;
         }
+
+        public double[,] data;
+        public void LoadData()
+        {
+            System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            int pointsPerChannel = dataPointCount / channelCount;
+            data = new double[channelCount, pointsPerChannel];
+            FileStream fs = File.OpenRead(abfFilePath);
+            BinaryReader br = new BinaryReader(fs);
+
+            br.BaseStream.Seek(dataByteStart, SeekOrigin.Begin);
+
+            for (int i=0; i<pointsPerChannel; i++)
+            {
+                for (int j=0; j<channelCount; j++)
+                {
+                    data[j, i] = br.ReadInt16();
+                    data[j, i] *= dataGainByChannel[j];
+                    data[j, i] += dataOffsetByChannel[j];
+                }
+            }
+            br.Close();
+            fs.Close();
+            double timeMS = stopwatch.ElapsedTicks * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
+            log.Debug(string.Format("loaded ABF data in {0:0.00} ms", timeMS));
+        }
+
+        public double[] sweepY;
+        public double sweepXoffset;
+        public void SetSweep(int sweepNumber = 0, int channelNumber = 0, bool absoluteTime = false)
+        {
+            System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            sweepY = new double[sweepPointCount];
+            int sweepFirstPoint = sweepPointCount * sweepNumber;
+            for (int i=sweepFirstPoint; i<sweepPointCount; i++)
+            {
+                sweepY[i] = data[channelNumber, i];
+            }
+            if (absoluteTime)
+            {
+                sweepXoffset = sweepPointCount*sweepNumber/dataRate;
+            } else
+            {
+                sweepXoffset = 0;
+            }            
+            double timeMS = stopwatch.ElapsedTicks * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
+            log.Debug(string.Format("set sweep in {0:0.00} ms", timeMS));
+        }
+        
 
 
     }
