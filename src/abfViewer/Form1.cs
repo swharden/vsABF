@@ -55,6 +55,7 @@ namespace abfViewer
         {
             ABF abf = new ABF(listBox1.SelectedValue.ToString());
             scottPlotUC1.Clear();
+            scottPlotUC1.fig.labelTitle = abf.abfID;
             scottPlotUC1.PlotSignal(abf.sweepY, abf.dataRate);
             scottPlotUC1.AxisAuto();
         }
