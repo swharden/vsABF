@@ -220,9 +220,7 @@ namespace vsABF
             data = new double[channelCount, pointsPerChannel];
             FileStream fs = File.OpenRead(abfFilePath);
             BinaryReader br = new BinaryReader(fs);
-
             br.BaseStream.Seek(dataByteStart, SeekOrigin.Begin);
-
             for (int i=0; i<pointsPerChannel; i++)
             {
                 for (int j=0; j<channelCount; j++)
@@ -245,9 +243,9 @@ namespace vsABF
             System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
             sweepY = new double[sweepPointCount];
             int sweepFirstPoint = sweepPointCount * sweepNumber;
-            for (int i=sweepFirstPoint; i<sweepPointCount; i++)
+            for (int i=0; i< sweepPointCount; i++)
             {
-                sweepY[i] = data[channelNumber, i];
+                sweepY[i] = data[channelNumber, i+ sweepFirstPoint];
             }
             if (absoluteTime)
             {
