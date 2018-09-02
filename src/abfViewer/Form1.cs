@@ -69,7 +69,11 @@ namespace abfViewer
                 for (int sweep=0; sweep<abf.sweepCount; sweep++)
                 {
                     abf.SetSweep(sweep);
-                    scottPlotUC1.PlotSignal(abf.sweepY, abf.dataRate, Color.Blue, 0, (double)nudVertOffset.Value*sweep);
+                    double offsetY = (double)nudVertOffset.Value * sweep;
+                    double offsetX = 0;
+                    if (cbContinuous.Checked)
+                        offsetX = sweep * abf.sweepPointCount / abf.dataRate;
+                    scottPlotUC1.PlotSignal(abf.sweepY, abf.dataRate, Color.Blue, offsetX, offsetY);
                     Console.WriteLine(abf.sweepY[0]);
                 }                
             } else
@@ -82,6 +86,14 @@ namespace abfViewer
 
         private void cbAllSweeps_CheckedChanged(object sender, EventArgs e)
         {
+            if (cbAllSweeps.Checked)
+            {
+                cbContinuous.Enabled = true;
+            } else
+            {
+                cbContinuous.Enabled = false;
+                cbContinuous.Checked = false;
+            }
             Replot();
         }
 
@@ -97,6 +109,11 @@ namespace abfViewer
             {
                 ScanAbfFolder(diag.SelectedPath);
             }
+        }
+
+        private void cbContinuous_CheckedChanged(object sender, EventArgs e)
+        {
+            Replot();
         }
     }
 }

@@ -34,6 +34,7 @@
             this.nudVertOffset = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            this.cbContinuous = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.nudVertOffset)).BeginInit();
             this.SuspendLayout();
             // 
@@ -102,11 +103,24 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // cbContinuous
+            // 
+            this.cbContinuous.AutoSize = true;
+            this.cbContinuous.Enabled = false;
+            this.cbContinuous.Location = new System.Drawing.Point(547, 597);
+            this.cbContinuous.Name = "cbContinuous";
+            this.cbContinuous.Size = new System.Drawing.Size(78, 17);
+            this.cbContinuous.TabIndex = 6;
+            this.cbContinuous.Text = "continuous";
+            this.cbContinuous.UseVisualStyleBackColor = true;
+            this.cbContinuous.CheckedChanged += new System.EventHandler(this.cbContinuous_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1055, 628);
+            this.Controls.Add(this.cbContinuous);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.nudVertOffset);
@@ -130,6 +144,7 @@
         private System.Windows.Forms.NumericUpDown nudVertOffset;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.CheckBox cbContinuous;
     }
 }
 
