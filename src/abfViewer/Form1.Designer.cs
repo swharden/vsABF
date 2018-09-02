@@ -35,7 +35,10 @@
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.cbContinuous = new System.Windows.Forms.CheckBox();
+            this.nudSweep = new System.Windows.Forms.NumericUpDown();
+            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudVertOffset)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudSweep)).BeginInit();
             this.SuspendLayout();
             // 
             // listBox1
@@ -68,6 +71,7 @@
             // 
             // nudVertOffset
             // 
+            this.nudVertOffset.Enabled = false;
             this.nudVertOffset.Increment = new decimal(new int[] {
             20,
             0,
@@ -115,11 +119,30 @@
             this.cbContinuous.UseVisualStyleBackColor = true;
             this.cbContinuous.CheckedChanged += new System.EventHandler(this.cbContinuous_CheckedChanged);
             // 
+            // nudSweep
+            // 
+            this.nudSweep.Location = new System.Drawing.Point(732, 596);
+            this.nudSweep.Name = "nudSweep";
+            this.nudSweep.Size = new System.Drawing.Size(87, 20);
+            this.nudSweep.TabIndex = 7;
+            this.nudSweep.ValueChanged += new System.EventHandler(this.nudSweep_ValueChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(691, 598);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(38, 13);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "sweep";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1055, 628);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.nudSweep);
             this.Controls.Add(this.cbContinuous);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
@@ -131,6 +154,7 @@
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.nudVertOffset)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudSweep)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -145,6 +169,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.CheckBox cbContinuous;
+        private System.Windows.Forms.NumericUpDown nudSweep;
+        private System.Windows.Forms.Label label2;
     }
 }
 

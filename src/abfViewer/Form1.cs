@@ -21,7 +21,11 @@ namespace abfViewer
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //ScanAbfFolder(@"C:\Users\scott\Documents\GitHub\pyABF\data\abfs");
+            string defaultFolder = @"C:\Users\scott\Documents\GitHub\pyABF\data\abfs";
+            if (Directory.Exists(defaultFolder))
+            {
+                ScanAbfFolder(defaultFolder);
+            }
         }
 
         private class AbfPath
@@ -55,6 +59,8 @@ namespace abfViewer
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             abf = new ABF(listBox1.SelectedValue.ToString());
+            nudSweep.Maximum = abf.sweepCount-1;
+            nudSweep.Value = 0;
             Replot();
         }
 
@@ -78,7 +84,7 @@ namespace abfViewer
                 }                
             } else
             {
-                abf.SetSweep(0);
+                abf.SetSweep((int)nudSweep.Value);
                 scottPlotUC1.PlotSignal(abf.sweepY, abf.dataRate);
             }            
             scottPlotUC1.AxisAuto();
@@ -89,10 +95,14 @@ namespace abfViewer
             if (cbAllSweeps.Checked)
             {
                 cbContinuous.Enabled = true;
+                nudSweep.Enabled = false;
+                nudVertOffset.Enabled = true;
             } else
             {
+                nudVertOffset.Enabled = false;
                 cbContinuous.Enabled = false;
                 cbContinuous.Checked = false;
+                nudSweep.Enabled = true;
             }
             Replot();
         }
@@ -112,6 +122,11 @@ namespace abfViewer
         }
 
         private void cbContinuous_CheckedChanged(object sender, EventArgs e)
+        {
+            Replot();
+        }
+
+        private void nudSweep_ValueChanged(object sender, EventArgs e)
         {
             Replot();
         }
