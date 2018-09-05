@@ -29,11 +29,16 @@ namespace ABFLib
         public int sweepCount;
         public int channelCount;
         public int sampleRate;
-
         public int dataLengthSec;
         public int dataPointCount;
         public int dataFirstByte;
-        
+        public string[] adcUnits;
+        private string[] indexedStrings;
+        public string protocolPath;
+        public string[] tagComments;
+        public double[] tagTimesSec;
+        private int[] tagTimes;
+
         // ABF2 sections
         private ABFsection sectionProtocol;
         private ABFsection sectionADC;
@@ -58,32 +63,29 @@ namespace ABFLib
             this.abfFilePath = abfFilePath;
             abfID = Path.GetFileNameWithoutExtension(abfFilePath);
             
-            // determine if ABF1 or ABF2 file
+            // read values out of the ABF header
             FileOpen();
             ReadFileFormat();
             ReadSectionMap();
+            ReadIndexedStrings();
             ReadSweepCount();
             ReadChannelCount();
             ReadSampleRate();
             ReadDataInfo();
+            ReadAdcUnits();
+            ReadProtocol();
+            ReadTags();
+
+            // read the data if we were asked to
+            if (preLoadData) {
+                //ReadData();
+                //SetSweep(0);
+            }
 
             // release the file
             FileClose();
         }
-
-
-        /*
-         *
-         *
-         * 
-         * 
-         * ABF CLASS SUPPORTIVE FUNCTIONS
-         * 
-         * 
-         * 
-         * 
-        */
-
+        
         /// <summary>
         /// Summarize this ABF's properties as a text block
         /// </summary>
@@ -97,23 +99,38 @@ namespace ABFLib
             foreach (FieldInfo x in fields)
             {
                 System.Object val = x.GetValue(this);
-                string valStr = "null";
 
-                // if it's null, say it's null
-                if (val != null)
+                // skip certain variables
+                string[] skippedVars = new string[] { "br", "indexedStrings", "tagTimes" };
+                if (skippedVars.Contains(x.Name))
+                    continue;
+
+                // skip sections
+                if (x.Name.StartsWith("section"))
+                    continue;
+
+                // prepare the object's value as a string
+                string valStr=null;
+                if (val == null)
                 {
-                    valStr = val.ToString();
+                    valStr = "";
                 }
-
-                // format string based on object type
-                if (val is ABFsection)
+                else if (val.GetType().IsArray)
+                {
+                    List<string> vals = new List<string>();
+                    foreach (var item in (Array)val)
+                    {
+                        vals.Add(item.ToString());
+                    }
+                    valStr = "[" + string.Join(", ", vals) + "]";
+                }
+                else if (val is ABFsection)
                 {
                     ABFsection section = (ABFsection)val;
                     valStr = $"ABFsection (firstByte={section.firstByte}, size={section.size}, count={section.count})";
-                }
-                else if (val is BinaryReader)
+                } else
                 {
-                    valStr = null;
+                    valStr = val.ToString();
                 }
 
                 // if our string contains text, show it
@@ -130,16 +147,6 @@ namespace ABFLib
             }
             return info+"\n";
         }
-
-        /*
-         *
-         *
-         * 
-         * FILE OPERATIONS
-         * 
-         * 
-         * 
-        */
 
         private void FileOpen()
         {
@@ -207,20 +214,7 @@ namespace ABFLib
             string txt = System.Text.Encoding.Default.GetString(bytes);
             return txt;
         }
-
-
-        /*
-         * 
-         * 
-         * 
-         * 
-         * READING OF VALUES FROM THE BINARY CONTENT OF ABF FILES
-         * 
-         * 
-         * 
-         * 
-         */
-
+        
         private void ReadFileFormat()
         {
             string firstFour = FileReadString(4, 0);
@@ -230,6 +224,15 @@ namespace ABFLib
                 abfVersionMajor = 2;
             else
                 throw new Exception($"Invalid ABF file: {abfFilePath}");
+        }
+
+        private ABFsection ReadSection(int firstByte)
+        {
+            ABFsection section = new ABFsection();
+            section.block = FileReadUInt32(firstByte);
+            section.size = FileReadUInt32();
+            section.count = FileReadUInt32();
+            return section;
         }
 
         private void ReadSectionMap()
@@ -252,18 +255,24 @@ namespace ABFLib
             }
         }
 
-        /// <summary>
-        /// Return the ABFsection for the section defined at firstByte
-        /// </summary>
-        private ABFsection ReadSection(int firstByte)
-        {
-            ABFsection section = new ABFsection();
-            section.block = FileReadUInt32(firstByte);
-            section.size = FileReadUInt32();
-            section.count = FileReadUInt32();
-            return section;
-        }
 
+        private void ReadIndexedStrings()
+        {
+            if (abfVersionMajor == 1)
+            {
+                // ABF1 files don't have a strings section
+            }
+            else if (abfVersionMajor == 2)
+            {
+                // all the indexed bits are in the first string
+                string firstString = FileReadString(sectionStrings.size, sectionStrings.firstByte);
+                firstString = firstString.Substring(firstString.LastIndexOf("\x00\x00"));
+                firstString = firstString.Replace("\xb5", "\x75"); // make mu u
+                indexedStrings = firstString.Split('\x00');
+                indexedStrings = indexedStrings.Skip(1).ToArray();
+            }
+        }
+        
         private void ReadSweepCount()
         {
             if (abfVersionMajor == 1)
@@ -322,6 +331,72 @@ namespace ABFLib
             }
 
             dataLengthSec = dataPointCount / sampleRate / channelCount;
+        }
+
+        private void ReadAdcUnits()
+        {
+            if (abfVersionMajor == 1)
+            {
+                // ABF1 files have 16 strings (8 letters long) in sADCUnits at byte 602
+                adcUnits = new string[16];
+                for (int i=0; i< adcUnits.Length; i++)
+                {
+                    adcUnits[i] = FileReadString(8, 602 + i * 8).Trim();
+                }
+            }
+            else if (abfVersionMajor == 2)
+            {
+                adcUnits = new string[sectionADC.count];
+                for (int i = 0; i < adcUnits.Length; i++)
+                {
+                    int itemFirstByte = sectionADC.firstByte + i * sectionADC.size;
+                    int adcUnitIndex = FileReadInt32(itemFirstByte + 78);
+                    adcUnits[i] = indexedStrings[adcUnitIndex].Trim();
+                }
+            }
+        }
+
+        private void ReadProtocol()
+        {
+            if (abfVersionMajor == 1)
+            {
+                // ABF1 files don't support epoch protocol
+                protocolPath = "";
+            }
+            else if (abfVersionMajor == 2)
+            {
+                // the protocol is the uProtocolPathIndex'th string
+                int uProtocolPathIndex = FileReadUInt32(72);
+                protocolPath = indexedStrings[uProtocolPathIndex];
+            }
+        }
+
+        private void ReadTags()
+        {
+            if (abfVersionMajor == 1)
+            {
+                // ABF1 files don't support tags
+            }
+            else if (abfVersionMajor == 2)
+            {
+                // tags are 56 character strings
+                tagComments = new string[sectionTag.count];
+                tagTimes = new int[sectionTag.count];
+                tagTimesSec = new double[sectionTag.count];
+
+                // prepare a multiplier to convert tag times into seconds
+                double fSynchTimeUnit = FileReadFloatSingle(sectionProtocol.firstByte + 14);
+                double tagMult = fSynchTimeUnit / 1e6;
+
+                for (int i = 0; i < sectionTag.count; i++)
+                {
+                    int itemFirstByte = sectionTag.firstByte + i * sectionTag.size;
+                    tagTimes[i] = FileReadUInt32(itemFirstByte);
+                    tagTimesSec[i] = tagTimes[i] * tagMult;
+                    tagComments[i] = FileReadString(56).Trim();
+                }
+
+            }
         }
     }
 }

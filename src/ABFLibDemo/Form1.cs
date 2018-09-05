@@ -18,14 +18,14 @@ namespace ABFLibDemo
         public Form1()
         {
             InitializeComponent();
-            LoadABF(@"C:\Users\scott\Documents\GitHub\pyABF\data\abfs\model_vc_step.abf");
+            button1_Click(null, null);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             richTextBox1.Clear();
+            LoadABF(@"C:\Users\scott\Documents\GitHub\pyABF\data\abfs\16d05007_vc_tags.abf");
             LoadABF(@"C:\Users\scott\Documents\GitHub\pyABF\data\abfs\05210017_vc_abf1.abf");
-            LoadABF(@"C:\Users\scott\Documents\GitHub\pyABF\data\abfs\model_vc_step.abf");
         }
 
         public void LoadABF(string abfFileName)
