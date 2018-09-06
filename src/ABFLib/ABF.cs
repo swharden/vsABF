@@ -26,18 +26,25 @@ namespace ABFLib
         public string abfFilePath;
         public string abfID;
         public int abfVersionMajor;
+        public string abfVersionString;
         public int sweepCount;
         public int channelCount;
         public int sampleRate;
         public int dataLengthSec;
         public int dataPointCount;
         public int dataFirstByte;
+        private int dataFormat;
+        private double[] dataGain;
+        private double[] dataOffset;
         public string[] adcUnits;
+        public string[] dacUnits;
         private string[] indexedStrings;
         public string protocolPath;
         public string[] tagComments;
         public double[] tagTimesSec;
         private int[] tagTimes;
+        public double[] holdingCommand;
+
 
         // ABF2 sections
         private ABFsection sectionProtocol;
@@ -62,22 +69,27 @@ namespace ABFLib
             abfFilePath = Path.GetFullPath(abfFilePath);
             this.abfFilePath = abfFilePath;
             abfID = Path.GetFileNameWithoutExtension(abfFilePath);
-            
+
             // read values out of the ABF header
             FileOpen();
             ReadFileFormat();
+            ReadVersion();
             ReadSectionMap();
             ReadIndexedStrings();
             ReadSweepCount();
             ReadChannelCount();
             ReadSampleRate();
             ReadDataInfo();
+            ReadGainAndOffset();
             ReadAdcUnits();
+            ReadDacUnits();
             ReadProtocol();
             ReadTags();
+            ReadHoldingLevels();
 
             // read the data if we were asked to
-            if (preLoadData) {
+            if (preLoadData)
+            {
                 //ReadData();
                 //SetSweep(0);
             }
@@ -85,7 +97,7 @@ namespace ABFLib
             // release the file
             FileClose();
         }
-        
+
         /// <summary>
         /// Summarize this ABF's properties as a text block
         /// </summary>
@@ -110,7 +122,7 @@ namespace ABFLib
                     continue;
 
                 // prepare the object's value as a string
-                string valStr=null;
+                string valStr = null;
                 if (val == null)
                 {
                     valStr = "";
@@ -128,7 +140,8 @@ namespace ABFLib
                 {
                     ABFsection section = (ABFsection)val;
                     valStr = $"ABFsection (firstByte={section.firstByte}, size={section.size}, count={section.count})";
-                } else
+                }
+                else
                 {
                     valStr = val.ToString();
                 }
@@ -145,15 +158,16 @@ namespace ABFLib
             {
                 info += $"{key} = {dict[key]}\n";
             }
-            return info+"\n";
+            return info + "\n";
         }
 
         private void FileOpen()
         {
             if (File.Exists(abfFilePath))
             {
-                br = new BinaryReader(File.Open(abfFilePath, FileMode.Open));       
-            } else
+                br = new BinaryReader(File.Open(abfFilePath, FileMode.Open));
+            }
+            else
             {
                 throw new Exception($"File does not exist: {abfFilePath}");
             }
@@ -176,6 +190,27 @@ namespace ABFLib
             if (bytePosition >= 0)
                 br.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
             return (double)br.ReadDouble();
+        }
+
+        private byte[] FileReadBytes(int charCount, int bytePosition = -1)
+        {
+            if (bytePosition >= 0)
+                br.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
+            return br.ReadBytes(charCount);
+        }
+
+        private int FileReadShort(int bytePosition = -1)
+        {
+            if (bytePosition >= 0)
+                br.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
+            return (int)br.ReadInt16();
+        }
+
+        private int FileReadUShort(int bytePosition = -1)
+        {
+            if (bytePosition >= 0)
+                br.BaseStream.Seek(bytePosition, SeekOrigin.Begin);
+            return (int)br.ReadUInt16();
         }
 
         private int FileReadInt16(int bytePosition = -1)
@@ -214,9 +249,10 @@ namespace ABFLib
             string txt = System.Text.Encoding.Default.GetString(bytes);
             return txt;
         }
-        
+
         private void ReadFileFormat()
         {
+            // determine the ABF file format
             string firstFour = FileReadString(4, 0);
             if (firstFour == "ABF ")
                 abfVersionMajor = 1;
@@ -224,6 +260,32 @@ namespace ABFLib
                 abfVersionMajor = 2;
             else
                 throw new Exception($"Invalid ABF file: {abfFilePath}");
+
+        }
+
+        private void ReadVersion()
+        {
+            if (abfVersionMajor == 1)
+            {
+                byte[] versionBytes = new byte[4];
+                double d = FileReadFloatSingle(4);
+                string s = d.ToString().Replace(".", "");
+                s = s.Substring(0, 4);
+                s = s.Insert(3, ".");
+                s = s.Insert(2, ".");
+                s = s.Insert(1, ".");
+                abfVersionString = s;
+            }
+            else if (abfVersionMajor == 2)
+            {
+                byte[] versionBytes = new byte[4];
+                versionBytes = FileReadBytes(4, 4);
+                abfVersionString = $"{versionBytes[3].ToString()}";
+                abfVersionString += $".{versionBytes[2].ToString()}";
+                abfVersionString += $".{versionBytes[1].ToString()}";
+                abfVersionString += $".{versionBytes[0].ToString()}";
+            }
+
         }
 
         private ABFsection ReadSection(int firstByte)
@@ -272,7 +334,7 @@ namespace ABFLib
                 indexedStrings = indexedStrings.Skip(1).ToArray();
             }
         }
-        
+
         private void ReadSweepCount()
         {
             if (abfVersionMajor == 1)
@@ -323,14 +385,75 @@ namespace ABFLib
 
                 int lActualAcqLength = FileReadInt32(10);
                 dataPointCount = lActualAcqLength;
+
+                int nDataFormat = FileReadShort(100);
+                dataFormat = nDataFormat;
             }
             else if (abfVersionMajor == 2)
             {
                 dataFirstByte = sectionData.firstByte;
+
                 dataPointCount = sectionData.count;
+
+                int nDataFormat = FileReadUShort(30);
+                dataFormat = nDataFormat;
             }
 
             dataLengthSec = dataPointCount / sampleRate / channelCount;
+        }
+
+        private void ReadGainAndOffset()
+        {
+            int scaleFactor;
+            int signalGain;
+            int programmableGain;
+            int telegraphGain;
+            int adcRange;
+            int adcResolution;
+            double offsetInstrument;
+            double offsetSignal;
+
+            if (abfVersionMajor == 1)
+            {
+                //TODO
+                scaleFactor = 0; // fInstrumentScaleFactor
+                signalGain = 0; // fSignalGain
+                programmableGain = 0; // fADCProgrammableGain
+                telegraphGain = 0; // if nTelegraphEnable, fTelegraphAdditGain
+                adcRange = 0; // fADCRange
+                adcResolution = 0; // lADCResolution
+                offsetInstrument = 0; // fInstrumentOffset
+                offsetSignal = 0; // fSignalOffset
+            }
+            else if (abfVersionMajor == 2)
+            {
+                //TODO
+                scaleFactor = 0; // adcSection.fInstrumentScaleFactor
+                signalGain = 0; // adcSection.fSignalGain
+                programmableGain = 0; // adcSection.fADCProgrammableGain
+                telegraphGain = 0; // if adcSection.nTelegraphEnable, adcSection.fTelegraphAdditGain
+                adcRange = 0; // protocolSection.fADCRange
+                adcResolution = 0; // protocolSection.lADCResolution
+                offsetInstrument = 0; // adcSection.fInstrumentOffset
+                offsetSignal = 0; // adcSection.fSignalOffset
+            } else
+            {
+                return;
+            }
+
+            dataGain = new double[channelCount];
+            dataOffset = new double[channelCount];
+            for (int i=0; i<channelCount; i++)
+            {
+                dataGain[i] = 1;
+                dataGain[i] /= scaleFactor;
+                dataGain[i] /= signalGain;
+                dataGain[i] /= programmableGain;
+                dataGain[i] /= telegraphGain;
+                dataGain[i] *= adcRange;
+                dataGain[i] /= adcResolution;
+                dataOffset[i] = 0 + offsetInstrument - offsetSignal;
+            }
         }
 
         private void ReadAdcUnits()
@@ -338,8 +461,8 @@ namespace ABFLib
             if (abfVersionMajor == 1)
             {
                 // ABF1 files have 16 strings (8 letters long) in sADCUnits at byte 602
-                adcUnits = new string[16];
-                for (int i=0; i< adcUnits.Length; i++)
+                adcUnits = new string[channelCount];
+                for (int i = 0; i < adcUnits.Length; i++)
                 {
                     adcUnits[i] = FileReadString(8, 602 + i * 8).Trim();
                 }
@@ -352,6 +475,24 @@ namespace ABFLib
                     int itemFirstByte = sectionADC.firstByte + i * sectionADC.size;
                     int adcUnitIndex = FileReadInt32(itemFirstByte + 78);
                     adcUnits[i] = indexedStrings[adcUnitIndex].Trim();
+                }
+            }
+        }
+
+        private void ReadDacUnits()
+        {
+            if (abfVersionMajor == 1)
+            {
+                // ABF1 files don't support this
+            }
+            else if (abfVersionMajor == 2)
+            {
+                dacUnits = new string[channelCount];
+                for (int i = 0; i < channelCount; i++)
+                {
+                    int byteOffset = sectionDAC.firstByte + i * sectionDAC.size;
+                    int lDACChannelUnits = FileReadInt16(byteOffset + 28);
+                    dacUnits[i] = indexedStrings[lDACChannelUnits];
                 }
             }
         }
@@ -396,6 +537,30 @@ namespace ABFLib
                     tagComments[i] = FileReadString(56).Trim();
                 }
 
+            }
+        }
+
+        private void ReadHoldingLevels()
+        {
+            if (abfVersionMajor == 1)
+            {
+                double[] fEpochInitLevel = new double[channelCount];
+                for (int i = 0; i < fEpochInitLevel.Length; i++)
+                {
+                    fEpochInitLevel[i] = FileReadFloatSingle(2348 + channelCount * i);
+                    fEpochInitLevel[i] = Math.Round(fEpochInitLevel[i], 5);
+                }
+                holdingCommand = fEpochInitLevel;
+            }
+            else if (abfVersionMajor == 2)
+            {
+                double[] fDACHoldingLevel = new double[channelCount];
+                for (int i = 0; i < channelCount; i++)
+                {
+                    int itemFirstByte = sectionDAC.firstByte + i * sectionDAC.size;
+                    fDACHoldingLevel[i] = FileReadFloatSingle(itemFirstByte + 12);
+                }
+                holdingCommand = fDACHoldingLevel;
             }
         }
     }
