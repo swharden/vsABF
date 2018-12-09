@@ -9,6 +9,31 @@ namespace AxonDLL
 {
     public class AbfStructs
     {
+        public const int ABF_ADCCOUNT = 16; // number of ADC channels supported.
+        public const int ABF_DACCOUNT = 8; // number of DAC channels supported.
+        public const int ABF_EPOCHCOUNT = 50; // number of waveform epochs supported.
+        public const int ABF_ADCUNITLEN = 8; // length of ADC units strings
+        public const int ABF_ADCNAMELEN = 10; // length of actual ADC channel name strings
+        public const int ABF_DACUNITLEN = 8; // length of DAC units strings
+        public const int ABF_DACNAMELEN = 10; // length of DAC channel name strings
+        public const int ABF_USERLISTLEN = 256; // length of the user list (V1.6)
+        public const int ABF_USERLISTCOUNT = ABF_DACCOUNT; // number of independent user lists (V1.6)       
+        public const int ABF_FILECOMMENTLEN = 128; // length of file comment string (V1.6)
+        public const int ABF_PATHLEN = 256; // length of full path, used for DACFile and Protocol name.
+        public const int ABF_CREATORINFOLEN = 16; // length of file creator info string
+        public const int ABF_ARITHMETICOPLEN = 2; // length of the Arithmetic operator field
+        public const int ABF_ARITHMETICUNITSLEN = 8; // length of arithmetic units string
+        public const int ABF_STATS_REGIONS = 24; // The number of independent statistics regions. // ST-91
+        
+        //public const int ABF_ADCNAMELEN_USER = 8; // length of user-entered ADC channel name strings
+        //public const int ABF_OLDFILECOMMENTLEN = 56; // length of file comment string (pre V1.6)
+        //public const int ABF_TAGCOMMENTLEN = 56; // length of tag comment string
+        //public const int ABF_BLOCKSIZE = 512; // Size of block alignment in ABF files.
+        //public const int PCLAMP6_MAXSWEEPLENGTH = 16384; // Maximum multiplexed sweep length supported by pCLAMP6 apps.
+        //public const int PCLAMP7_MAXSWEEPLEN_PERCHAN = 1032258; // Maximum per channel sweep length supported by pCLAMP7 apps.
+        //public const int PCLAMP11_MAXSWEEPLEN_PERCHAN = 5161290; // Maximum per channel sweep length supported by pCLAMP11 apps. //ST-1
+        //public const int ABF_MAX_SWEEPS_PER_AVERAGE = 65500; // The maximum number of sweeps that can be combined into a cumulative average 
+        //public const int ABF_MAX_TRIAL_SAMPLES = 0x7FFFFFFF; // Maximum length of acquisition supported (samples)
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
         public unsafe struct ABFFileHeader
@@ -43,8 +68,8 @@ namespace AxonDLL
             public Int32 lStatisticsConfigPtr;
             public Int32 lAnnotationSectionPtr;
             public Int32 lNumAnnotations;
-            public fixed Int32 lDACFilePtr[8];
-            public fixed Int32 lDACFileNumEpisodes[8];
+            public fixed Int32 lDACFilePtr[ABF_DACCOUNT];
+            public fixed Int32 lDACFileNumEpisodes[ABF_DACCOUNT];
 
             // GROUP #3 - Trial hierarchy information
             public Int16 nADCNumChannels;
@@ -102,49 +127,49 @@ namespace AxonDLL
             public Single fCellID1;
             public Single fCellID2;
             public Single fCellID3;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)] public string sProtocolPath;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)] public string sCreatorInfo;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)] public string sModifierInfo;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_PATHLEN)] public string sProtocolPath;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_CREATORINFOLEN)] public string sCreatorInfo;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_CREATORINFOLEN)] public string sModifierInfo;
             public Int16 nCommentsEnable;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)] public string sFileComment;
-            public fixed Int16 nTelegraphEnable[16];
-            public fixed Int16 nTelegraphInstrument[16];
-            public fixed Single fTelegraphAdditGain[16];
-            public fixed Single fTelegraphFilter[16];
-            public fixed Single fTelegraphMembraneCap[16];
-            public fixed Single fTelegraphAccessResistance[16];
-            public fixed Int16 nTelegraphMode[16];
-            public fixed Int16 nTelegraphDACScaleFactorEnable[8];
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_FILECOMMENTLEN)] public string sFileComment;
+            public fixed Int16 nTelegraphEnable[ABF_ADCCOUNT];
+            public fixed Int16 nTelegraphInstrument[ABF_ADCCOUNT];
+            public fixed Single fTelegraphAdditGain[ABF_ADCCOUNT];
+            public fixed Single fTelegraphFilter[ABF_ADCCOUNT];
+            public fixed Single fTelegraphMembraneCap[ABF_ADCCOUNT];
+            public fixed Single fTelegraphAccessResistance[ABF_ADCCOUNT];
+            public fixed Int16 nTelegraphMode[ABF_ADCCOUNT];
+            public fixed Int16 nTelegraphDACScaleFactorEnable[ABF_DACCOUNT];
             public Int16 nAutoAnalyseEnable;
             public Guid FileGUID;
-            public fixed Single fInstrumentHoldingLevel[8];
+            public fixed Single fInstrumentHoldingLevel[ABF_DACCOUNT];
             public UInt32 ulFileCRC;
             public Int16 nCRCEnable;
 
             // GROUP #7 - Multi-channel information
             public Int16 nSignalType;
-            public fixed Int16 nADCPtoLChannelMap[16];
-            public fixed Int16 nADCSamplingSeq[16];
-            public fixed Single fADCProgrammableGain[16];
-            public fixed Single fADCDisplayAmplification[16];
-            public fixed Single fADCDisplayOffset[16];
-            public fixed Single fInstrumentScaleFactor[16];
-            public fixed Single fInstrumentOffset[16];
-            public fixed Single fSignalGain[16];
-            public fixed Single fSignalOffset[16];
-            public fixed Single fSignalLowpassFilter[16];
-            public fixed Single fSignalHighpassFilter[16];
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)] public string nLowpassFilterType;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)] public string nHighpassFilterType;
-            public fixed Byte bHumFilterEnable[16];
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16*10)] public string sADCChannelName;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16*8)] public string sADCUnits;
-            public fixed Single fDACScaleFactor[8];
-            public fixed Single fDACHoldingLevel[8];
-            public fixed Single fDACCalibrationFactor[8];
-            public fixed Single fDACCalibrationOffset[8];
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 8*10)] public string sDACChannelName;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 8*8)] public string sDACChannelUnits;
+            public fixed Int16 nADCPtoLChannelMap[ABF_ADCCOUNT];
+            public fixed Int16 nADCSamplingSeq[ABF_ADCCOUNT];
+            public fixed Single fADCProgrammableGain[ABF_ADCCOUNT];
+            public fixed Single fADCDisplayAmplification[ABF_ADCCOUNT];
+            public fixed Single fADCDisplayOffset[ABF_ADCCOUNT];
+            public fixed Single fInstrumentScaleFactor[ABF_ADCCOUNT];
+            public fixed Single fInstrumentOffset[ABF_ADCCOUNT];
+            public fixed Single fSignalGain[ABF_ADCCOUNT];
+            public fixed Single fSignalOffset[ABF_ADCCOUNT];
+            public fixed Single fSignalLowpassFilter[ABF_ADCCOUNT];
+            public fixed Single fSignalHighpassFilter[ABF_ADCCOUNT];
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_ADCCOUNT)] public string nLowpassFilterType;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_ADCCOUNT)] public string nHighpassFilterType;
+            public fixed Byte bHumFilterEnable[ABF_ADCCOUNT];
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_ADCCOUNT * ABF_ADCNAMELEN)] public string sADCChannelName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_ADCCOUNT * ABF_ADCUNITLEN)] public string sADCUnits;
+            public fixed Single fDACScaleFactor[ABF_DACCOUNT];
+            public fixed Single fDACHoldingLevel[ABF_DACCOUNT];
+            public fixed Single fDACCalibrationFactor[ABF_DACCOUNT];
+            public fixed Single fDACCalibrationOffset[ABF_DACCOUNT];
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_DACCOUNT * ABF_DACNAMELEN)] public string sDACChannelName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_DACCOUNT * ABF_DACUNITLEN)] public string sDACChannelUnits;
 
             // GROUP #9 - Epoch Waveform and Pulses
             public Int16 nDigitalEnable;
@@ -153,65 +178,65 @@ namespace AxonDLL
             public Int16 nDigitalHolding;
             public Int16 nDigitalInterEpisode;
             public Int16 nDigitalTrainActiveLogic;
-            public fixed Int16 nDigitalValue[50];
-            public fixed Int16 nDigitalTrainValue[50];
-            public fixed Byte bEpochCompression[50];
-            public fixed Int16 nWaveformEnable[8];
-            public fixed Int16 nWaveformSource[8];
-            public fixed Int16 nInterEpisodeLevel[8];
-            public fixed Int16 nEpochType[8 * 50];
-            public fixed Single fEpochInitLevel[8 * 50];
-            public fixed Single fEpochFinalLevel[8 * 50];
-            public fixed Single fEpochLevelInc[8 * 50];
-            public fixed Int32 lEpochInitDuration[8 * 50];
-            public fixed Int32 lEpochDurationInc[8 * 50];
-            public fixed Int16 nEpochTableRepetitions[8];
-            public fixed Single fEpochTableStartToStartInterval[8];
+            public fixed Int16 nDigitalValue[ABF_EPOCHCOUNT];
+            public fixed Int16 nDigitalTrainValue[ABF_EPOCHCOUNT];
+            public fixed Byte bEpochCompression[ABF_EPOCHCOUNT];
+            public fixed Int16 nWaveformEnable[ABF_DACCOUNT];
+            public fixed Int16 nWaveformSource[ABF_DACCOUNT];
+            public fixed Int16 nInterEpisodeLevel[ABF_DACCOUNT];
+            public fixed Int16 nEpochType[ABF_DACCOUNT * ABF_EPOCHCOUNT];
+            public fixed Single fEpochInitLevel[ABF_DACCOUNT * ABF_EPOCHCOUNT];
+            public fixed Single fEpochFinalLevel[ABF_DACCOUNT * ABF_EPOCHCOUNT];
+            public fixed Single fEpochLevelInc[ABF_DACCOUNT * ABF_EPOCHCOUNT];
+            public fixed Int32 lEpochInitDuration[ABF_DACCOUNT * ABF_EPOCHCOUNT];
+            public fixed Int32 lEpochDurationInc[ABF_DACCOUNT * ABF_EPOCHCOUNT];
+            public fixed Int16 nEpochTableRepetitions[ABF_DACCOUNT];
+            public fixed Single fEpochTableStartToStartInterval[ABF_DACCOUNT];
 
             // GROUP #10 - DAC Output File
-            public fixed Single fDACFileScale[8];
-            public fixed Single fDACFileOffset[8];
-            public fixed Int32 lDACFileEpisodeNum[8];
-            public fixed Int16 nDACFileADCNum[8];
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 8 * 256)] public string sDACFilePath;
+            public fixed Single fDACFileScale[ABF_DACCOUNT];
+            public fixed Single fDACFileOffset[ABF_DACCOUNT];
+            public fixed Int32 lDACFileEpisodeNum[ABF_DACCOUNT];
+            public fixed Int16 nDACFileADCNum[ABF_DACCOUNT];
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_DACCOUNT * ABF_PATHLEN)] public string sDACFilePath;
 
             // GROUP #11a - Presweep (conditioning) pulse train
-            public fixed Int16 nConditEnable[8];
-            public fixed Int32 lConditNumPulses[8];
-            public fixed Single fBaselineDuration[8];
-            public fixed Single fBaselineLevel[8];
-            public fixed Single fStepDuration[8];
-            public fixed Single fStepLevel[8];
-            public fixed Single fPostTrainPeriod[8];
-            public fixed Single fPostTrainLevel[8];
-            public fixed Single fCTStartLevel[8 * 50];
-            public fixed Single fCTEndLevel[8 * 50];
-            public fixed Single fCTIntervalDuration[8 * 50];
-            public fixed Single fCTStartToStartInterval[8];
+            public fixed Int16 nConditEnable[ABF_DACCOUNT];
+            public fixed Int32 lConditNumPulses[ABF_DACCOUNT];
+            public fixed Single fBaselineDuration[ABF_DACCOUNT];
+            public fixed Single fBaselineLevel[ABF_DACCOUNT];
+            public fixed Single fStepDuration[ABF_DACCOUNT];
+            public fixed Single fStepLevel[ABF_DACCOUNT];
+            public fixed Single fPostTrainPeriod[ABF_DACCOUNT];
+            public fixed Single fPostTrainLevel[ABF_DACCOUNT];
+            public fixed Single fCTStartLevel[ABF_DACCOUNT * ABF_EPOCHCOUNT];
+            public fixed Single fCTEndLevel[ABF_DACCOUNT * ABF_EPOCHCOUNT];
+            public fixed Single fCTIntervalDuration[ABF_DACCOUNT * ABF_EPOCHCOUNT];
+            public fixed Single fCTStartToStartInterval[ABF_DACCOUNT];
 
             // GROUP #11b - Membrane Test Between Sweeps
-            public fixed Int16 nMembTestEnable[8];
-            public fixed Single fMembTestPreSettlingTimeMS[8];
-            public fixed Single fMembTestPostSettlingTimeMS[8];
+            public fixed Int16 nMembTestEnable[ABF_DACCOUNT];
+            public fixed Single fMembTestPreSettlingTimeMS[ABF_DACCOUNT];
+            public fixed Single fMembTestPostSettlingTimeMS[ABF_DACCOUNT];
 
             // GROUP #11c - PreSignal test pulse
-            public fixed Int16 nPreSignalEnable[8];
-            public fixed Single fPreSignalPreStepDuration[8];
-            public fixed Single fPreSignalPreStepLevel[8];
-            public fixed Single fPreSignalStepDuration[8];
-            public fixed Single fPreSignalStepLevel[8];
-            public fixed Single fPreSignalPostStepDuration[8];
-            public fixed Single fPreSignalPostStepLevel[8];
+            public fixed Int16 nPreSignalEnable[ABF_DACCOUNT];
+            public fixed Single fPreSignalPreStepDuration[ABF_DACCOUNT];
+            public fixed Single fPreSignalPreStepLevel[ABF_DACCOUNT];
+            public fixed Single fPreSignalStepDuration[ABF_DACCOUNT];
+            public fixed Single fPreSignalStepLevel[ABF_DACCOUNT];
+            public fixed Single fPreSignalPostStepDuration[ABF_DACCOUNT];
+            public fixed Single fPreSignalPostStepLevel[ABF_DACCOUNT];
 
             // GROUP #11d - Hum Silncer Adapt between sweeps
             public Int16 nAdaptEnable;
             public Single fInterSweepAdaptTimeS;
 
             // GROUP #12 - Variable parameter user list
-            public fixed Int16 nULEnable[8];
-            public fixed Int16 nULParamToVary[8];
-            public fixed Int16 nULRepeat[8];
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 8 * 256)] public string sULParamValueList;
+            public fixed Int16 nULEnable[ABF_USERLISTCOUNT];
+            public fixed Int16 nULParamToVary[ABF_USERLISTCOUNT];
+            public fixed Int16 nULRepeat[ABF_USERLISTCOUNT];
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_USERLISTCOUNT * ABF_USERLISTLEN)] public string sULParamValueList;
 
             // GROUP #13 - Statistics measurements
             public Int16 nStatsEnable;
@@ -223,16 +248,16 @@ namespace AxonDLL
             public Int16 nStatsBaselineDAC;
             public Int32 lStatsBaselineStart;
             public Int32 lStatsBaselineEnd;
-            public fixed Int32 lStatsMeasurements[24];
-            public fixed Int32 lStatsStart[24];
-            public fixed Int32 lStatsEnd[24];
-            public fixed Int16 nRiseBottomPercentile[24];
-            public fixed Int16 nRiseTopPercentile[24];
-            public fixed Int16 nDecayBottomPercentile[24];
-            public fixed Int16 nDecayTopPercentile[24];
-            public fixed Int16 nStatsChannelPolarity[16];
-            public fixed Int16 nStatsSearchMode[24];
-            public fixed Int16 nStatsSearchDAC[24];
+            public fixed Int32 lStatsMeasurements[ABF_STATS_REGIONS];
+            public fixed Int32 lStatsStart[ABF_STATS_REGIONS];
+            public fixed Int32 lStatsEnd[ABF_STATS_REGIONS];
+            public fixed Int16 nRiseBottomPercentile[ABF_STATS_REGIONS];
+            public fixed Int16 nRiseTopPercentile[ABF_STATS_REGIONS];
+            public fixed Int16 nDecayBottomPercentile[ABF_STATS_REGIONS];
+            public fixed Int16 nDecayTopPercentile[ABF_STATS_REGIONS];
+            public fixed Int16 nStatsChannelPolarity[ABF_ADCCOUNT];
+            public fixed Int16 nStatsSearchMode[ABF_STATS_REGIONS];
+            public fixed Int16 nStatsSearchDAC[ABF_STATS_REGIONS];
 
             // GROUP #14 - Channel Arithmetic
             public Int16 nArithmeticEnable;
@@ -247,8 +272,8 @@ namespace AxonDLL
             public Single fArithmeticK4;
             public Single fArithmeticK5;
             public Single fArithmeticK6;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 2)] public string sArithmeticOperator;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 8)] public string sArithmeticUnits;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_ARITHMETICOPLEN)] public string sArithmeticOperator;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_ARITHMETICUNITSLEN)] public string sArithmeticUnits;
 
             // GROUP #15 - Leak subtraction
             public Int16 nPNPosition;
@@ -256,9 +281,9 @@ namespace AxonDLL
             public Int16 nPNPolarity;
             public Single fPNSettlingTime;
             public Single fPNInterpulse;
-            public fixed Int16 nLeakSubtractType[8];
-            public fixed Single fPNHoldingLevel[8];
-            public fixed Int16 nLeakSubtractADCIndex[8];
+            public fixed Int16 nLeakSubtractType[ABF_DACCOUNT];
+            public fixed Single fPNHoldingLevel[ABF_DACCOUNT];
+            public fixed Int16 nLeakSubtractADCIndex[ABF_DACCOUNT];
 
             // GROUP #16 - Miscellaneous variables
             public Int16 nLevelHysteresis;
@@ -275,8 +300,8 @@ namespace AxonDLL
             public Int16 nEnableFirstLastHolding;
 
             // GROUP #17 - Trains parameters
-            public fixed Int32 lEpochPulsePeriod[8 * 50];
-            public fixed Int32 lEpochPulseWidth[8 * 50];
+            public fixed Int32 lEpochPulsePeriod[ABF_DACCOUNT * ABF_EPOCHCOUNT];
+            public fixed Int32 lEpochPulseWidth[ABF_DACCOUNT * ABF_EPOCHCOUNT];
 
             // GROUP #18 - Application version data
             public Int16 nCreatorMajorVersion;
@@ -290,25 +315,25 @@ namespace AxonDLL
 
             // GROUP #19 - LTP protocol
             public Int16 nLTPType;
-            public fixed Int16 nLTPUsageOfDAC[8];
-            public fixed Int16 nLTPPresynapticPulses[8];
+            public fixed Int16 nLTPUsageOfDAC[ABF_DACCOUNT];
+            public fixed Int16 nLTPPresynapticPulses[ABF_DACCOUNT];
 
             // GROUP #20 - Digidata 132x Trigger out flag
             public Int16 nScopeTriggerOut;
 
             // GROUP #21 - Epoch resistance
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 8 * 10)] public string sEpochResistanceSignalName;
-            public fixed Int16 nEpochResistanceState[8];
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_DACCOUNT * ABF_ADCNAMELEN)] public string sEpochResistanceSignalName;
+            public fixed Int16 nEpochResistanceState[ABF_DACCOUNT];
 
             // GROUP #22 - Alternating episodic mode
             public Int16 nAlternateDACOutputState;
             public Int16 nAlternateDigitalOutputState;
-            public fixed Int16 nAlternateDigitalValue[50];
-            public fixed Int16 nAlternateDigitalTrainValue[50];
+            public fixed Int16 nAlternateDigitalValue[ABF_EPOCHCOUNT];
+            public fixed Int16 nAlternateDigitalTrainValue[ABF_EPOCHCOUNT];
 
             // GROUP #23 - Post-processing actions
-            public fixed Single fPostProcessLowpassFilter[16];
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)] public string nPostProcessLowpassFilterType;
+            public fixed Single fPostProcessLowpassFilter[ABF_ADCCOUNT];
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ABF_ADCCOUNT)] public string nPostProcessLowpassFilterType;
 
             // GROUP #24 - Legacy gear shift info
             public Single fLegacyADCSequenceInterval;
@@ -317,10 +342,10 @@ namespace AxonDLL
             public Int32 lLegacyNumSamplesPerEpisode;
 
             // GROUP #25 - Gap-Free Config
-            public fixed Int16 nGapFreeEpochType[8 * 50];
-            public fixed Single fGapFreeEpochLevel[8 * 50];
-            public fixed Int32 lGapFreeEpochDuration[8 * 50];
-            public fixed Byte nGapFreeDigitalValue[8 * 50];
+            public fixed Int16 nGapFreeEpochType[ABF_DACCOUNT * ABF_EPOCHCOUNT];
+            public fixed Single fGapFreeEpochLevel[ABF_DACCOUNT * ABF_EPOCHCOUNT];
+            public fixed Int32 lGapFreeEpochDuration[ABF_DACCOUNT * ABF_EPOCHCOUNT];
+            public fixed Byte nGapFreeDigitalValue[ABF_DACCOUNT * ABF_EPOCHCOUNT];
             public Int16 nGapFreeEpochStart;
         };
     }
