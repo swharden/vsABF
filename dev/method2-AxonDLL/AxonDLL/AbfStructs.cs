@@ -24,7 +24,7 @@ namespace AxonDLL
         public const int ABF_ARITHMETICOPLEN = 2; // length of the Arithmetic operator field
         public const int ABF_ARITHMETICUNITSLEN = 8; // length of arithmetic units string
         public const int ABF_STATS_REGIONS = 24; // The number of independent statistics regions. // ST-91
-        
+
         //public const int ABF_ADCNAMELEN_USER = 8; // length of user-entered ADC channel name strings
         //public const int ABF_OLDFILECOMMENTLEN = 56; // length of file comment string (pre V1.6)
         //public const int ABF_TAGCOMMENTLEN = 56; // length of tag comment string

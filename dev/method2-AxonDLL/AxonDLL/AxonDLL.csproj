@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbfReader.cs" />
+    <Compile Include="AbfStructDisplay.cs" />
     <Compile Include="AbfStructs.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
