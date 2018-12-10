@@ -20,12 +20,6 @@ namespace AxonDLL
         [DllImport("ABFFIO.dll", CharSet = CharSet.Ansi)]
         private static extern bool ABF_ReadChannel(Int32 nFile, ref AbfStructs.ABFFileHeader pFH, Int32 nChannel, Int32 dwEpisode, ref float pfBuffer, ref UInt32 puNumSamples, ref Int32 pnError);
 
-        [DllImport("ABFFIO.dll", CharSet = CharSet.Ansi)]
-        private static extern bool ABF_ReadRawChannel(Int32 nFile, ref AbfStructs.ABFFileHeader pFH, Int32 nChannel, Int32 dwEpisode, ref Int16 pfBuffer, ref UInt32 puNumSamples, ref Int32 pnError);
-
-        [DllImport("ABFFIO.dll", CharSet = CharSet.Ansi)]
-        private static extern bool ABF_MultiplexRead(Int32 nFile, ref AbfStructs.ABFFileHeader pFH, Int32 dwEpisode, ref Int16 pfBuffer, ref UInt32 puNumSamples, ref Int32 pnError);
-
         public unsafe AbfReader(string abfFilePath)
         {
             // start the timer
@@ -39,57 +33,25 @@ namespace AxonDLL
             UInt32 sweepCount = 0;
             Int32 errorCode = 0;
             uint loadFlags = 0;
+            errorCode = 0;
             ABF_ReadOpen(abfFilePath, ref hFile, loadFlags, ref header, ref sweepPointCount, ref sweepCount, ref errorCode);
-            if (errorCode != 0) {
-                log($">>>ERROR: {errorCode}");
-                errorCode = 0;
-            }
-            log($"points per sweep: {sweepPointCount}");
-            log($"sweeps: {sweepCount}");
-
-            /*
-            // read the first sweep of the first channel
-            log($"samples per episode: {header.lNumSamplesPerEpisode}");
-            uint bufferSize = (uint)(header.lNumSamplesPerEpisode / header.nADCNumChannels);
-            float[] sweepBuffer = new float[bufferSize];
-            log($"buffer size: {bufferSize}");
-
-            int channel = 1;
-            int sweep = 3;
-            ABF_ReadChannel(hFile, ref header, channel, sweep, ref sweepBuffer[0], ref bufferSize, ref errorCode);
-            if (errorCode == 0)
+            if (errorCode != 0) log($">>>ERROR: {errorCode}");
+            
+            // show every sweep of every channel
+            float[] sweepBuffer = new float[sweepPointCount];
+            int channelCount = header.nADCNumChannels;
+            for (int channel = 0; channel < channelCount; channel++)
             {
-                string vals = $"{sweepBuffer[0]}, {sweepBuffer[1]}, {sweepBuffer[2]}, ... , {sweepBuffer[sweepBuffer.Length - 2]}, {sweepBuffer[sweepBuffer.Length - 1]}";
-                log($"Ch {channel} Sweep {sweep}: {vals}");
-            }
-            else
-            {
-                log($"Ch {channel} Sweep {sweep}: ERROR {errorCode}");
-                errorCode = 0;
-            }
-            */
-
-            // perform a multiplexed read of a given sweep
-            uint bufferSize = (uint)(header.lNumSamplesPerEpisode);
-            Int16[] sweepBuffer = new Int16[bufferSize];
-            ABF_MultiplexRead(hFile, ref header, 1, ref sweepBuffer[0], ref bufferSize, ref errorCode);
-
-            if (errorCode == 0)
-            {
-                for (int channel=0; channel< header.nADCNumChannels; channel++)
+                int physicalChannel = header.nADCSamplingSeq[channel];
+                log($"\nChannel {channel} (phsical channel {physicalChannel}):");
+                for (int sweep = 1; sweep <= sweepCount; sweep++)
                 {
-                    string vals = "";
-                    for (int j=0; j<20; j++)
-                    {
-                        vals += $"{sweepBuffer[j * header.nADCNumChannels + channel]} ";
-                    }
-                    log($"Channel {channel}: {vals}");
+                    errorCode = 0;
+                    ABF_ReadChannel(hFile, ref header, physicalChannel, sweep, ref sweepBuffer[0], ref sweepPointCount, ref errorCode);
+                    if (errorCode != 0) log($"\n\n>>>ERROR: {errorCode}");
+                    string vals = $"{sweepBuffer[0]}, {sweepBuffer[1]}, {sweepBuffer[2]}, ... , {sweepBuffer[sweepBuffer.Length - 2]}, {sweepBuffer[sweepBuffer.Length - 1]}";
+                    log($"Ch {channel} Sweep {sweep}: {vals}");
                 }
-            }
-            else
-            {
-                log($"ERROR {errorCode}");
-                errorCode = 0;
             }
 
             // finish stopwatch

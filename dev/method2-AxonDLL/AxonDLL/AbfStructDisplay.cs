@@ -9,7 +9,7 @@ namespace AxonDLL
     public class AbfStructDisplay
     {
 
-        private static string txtValue(string variable, string value)
+        private static string txtFormat(string variable, string value)
         {
             if (variable == "")
             {
@@ -21,381 +21,314 @@ namespace AxonDLL
             }
         }
 
-        public static unsafe string txtArrayString(string variable, string value, int stringLength)
-        {
-            int stringCount = value.Length / stringLength;
-            string s = "";
-            for (int i = 0; i < stringCount; i++)
-            {
-                string sub = value.Substring(i * stringLength, stringLength).Trim();
-                if (sub == "") sub = "null";
-                s += sub + ", ";
-            }
-            s = s.Trim().Trim(',');
-            return txtValue(variable, "[" + s.Trim() + "]");
-        }
-
-        public static unsafe string txtArrayByte(string variable, Byte* address, int count)
-        {
-            string s = "";
-            for (int i = 0; i < count; i++)
-            {
-                Byte value = *(address + i);
-                s += value.ToString() + ", ";
-            }
-            s = s.Trim().Trim(',');
-            return txtValue(variable, "[" + s.Trim() + "]");
-        }
-
-        public static unsafe string txtArraySingle(string variable, Single* address, int count)
-        {
-            string s = "";
-            for (int i = 0; i < count; i++)
-            {
-                Single value = *(address + i);
-                s += value.ToString() + ", ";
-            }
-            s = s.Trim().Trim(',');
-            return txtValue(variable, "[" + s.Trim() + "]");
-        }
-
-        public static unsafe string txtArrayInt16(string variable, Int16* address, int count)
-        {
-            string s = "";
-            for (int i = 0; i < count; i++)
-            {
-                int value = *(address + i);
-                s += value.ToString() + ", ";
-            }
-            s = s.Trim().Trim(',');
-            return txtValue(variable, "[" + s.Trim() + "]");
-        }
-
-        public static unsafe string txtArrayInt32(string variable, Int32* address, int count)
-        {
-            string s = "";
-            for (int i = 0; i < count; i++)
-            {
-                int value = *(address + i);
-                s += value.ToString() + ", ";
-            }
-            s = s.Trim().Trim(',');
-            return txtValue(variable, "[" + s.Trim() + "]");
-        }
-
         // display header just like ABFINFO program does
         public static unsafe string headerToString(AbfStructs.ABFFileHeader header)
         {
             string txt = "";
 
-            txt += txtValue("", "GROUP #1 - File ID and size information");
-            txt += txtValue("fFileVersionNumber ", header.fFileVersionNumber.ToString());
-            txt += txtValue("nOperationMode", header.nOperationMode.ToString());
-            txt += txtValue("lActualAcqLength ", header.lActualAcqLength.ToString());
-            txt += txtValue("nNumPointsIgnored", header.nNumPointsIgnored.ToString());
-            txt += txtValue("lActualEpisodes", header.lActualEpisodes.ToString());
-            txt += txtValue("uFileStartDate", header.uFileStartDate.ToString());
-            txt += txtValue("uFileStartTimeMS", header.uFileStartTimeMS.ToString());
-            txt += txtValue("lStopwatchTime", header.lStopwatchTime.ToString());
-            txt += txtValue("fHeaderVersionNumber", header.fHeaderVersionNumber.ToString());
-            txt += txtValue("nFileType", header.nFileType.ToString());
+            txt += txtFormat("", "GROUP #1 - File ID and size information");
+            txt += txtFormat("fFileVersionNumber ", header.fFileVersionNumber.ToString());
+            txt += txtFormat("nOperationMode", header.nOperationMode.ToString());
+            txt += txtFormat("lActualAcqLength ", header.lActualAcqLength.ToString());
+            txt += txtFormat("nNumPointsIgnored", header.nNumPointsIgnored.ToString());
+            txt += txtFormat("lActualEpisodes", header.lActualEpisodes.ToString());
+            txt += txtFormat("uFileStartDate", header.uFileStartDate.ToString());
+            txt += txtFormat("uFileStartTimeMS", header.uFileStartTimeMS.ToString());
+            txt += txtFormat("lStopwatchTime", header.lStopwatchTime.ToString());
+            txt += txtFormat("fHeaderVersionNumber", header.fHeaderVersionNumber.ToString());
+            txt += txtFormat("nFileType", header.nFileType.ToString());
 
-            txt += txtValue("", "GROUP #2 - File Structure");
-            txt += txtValue("lDataSectionPtr", header.lDataSectionPtr.ToString());
-            txt += txtValue("lTagSectionPtr", header.lTagSectionPtr.ToString());
-            txt += txtValue("lNumTagEntries", header.lNumTagEntries.ToString());
-            txt += txtValue("lScopeConfigPtr", header.lScopeConfigPtr.ToString());
-            txt += txtValue("lNumScopes", header.lNumScopes.ToString());
-            txt += txtValue("lDeltaArrayPtr", header.lDeltaArrayPtr.ToString());
-            txt += txtValue("lNumDeltas", header.lNumDeltas.ToString());
-            txt += txtValue("lVoiceTagPtr", header.lVoiceTagPtr.ToString());
-            txt += txtValue("lVoiceTagEntries", header.lVoiceTagEntries.ToString());
-            txt += txtValue("lSynchArrayPtr", header.lSynchArrayPtr.ToString());
-            txt += txtValue("lSynchArraySize", header.lSynchArraySize.ToString());
-            txt += txtValue("nDataFormat", header.nDataFormat.ToString());
-            txt += txtValue("nSimultaneousScan", header.nSimultaneousScan.ToString());
-            txt += txtValue("lStatisticsConfigPtr", header.lStatisticsConfigPtr.ToString());
-            txt += txtValue("lAnnotationSectionPtr", header.lAnnotationSectionPtr.ToString());
-            txt += txtValue("lNumAnnotations", header.lNumAnnotations.ToString());
-            txt += txtArrayInt32("lDACFilePtr", header.lDACFilePtr, 8);
-            txt += txtArrayInt32("lDACFileNumEpisodes", header.lDACFileNumEpisodes, 8);
+            txt += txtFormat("", "GROUP #2 - File Structure");
+            txt += txtFormat("lDataSectionPtr", header.lDataSectionPtr.ToString());
+            txt += txtFormat("lTagSectionPtr", header.lTagSectionPtr.ToString());
+            txt += txtFormat("lNumTagEntries", header.lNumTagEntries.ToString());
+            txt += txtFormat("lScopeConfigPtr", header.lScopeConfigPtr.ToString());
+            txt += txtFormat("lNumScopes", header.lNumScopes.ToString());
+            txt += txtFormat("lDeltaArrayPtr", header.lDeltaArrayPtr.ToString());
+            txt += txtFormat("lNumDeltas", header.lNumDeltas.ToString());
+            txt += txtFormat("lVoiceTagPtr", header.lVoiceTagPtr.ToString());
+            txt += txtFormat("lVoiceTagEntries", header.lVoiceTagEntries.ToString());
+            txt += txtFormat("lSynchArrayPtr", header.lSynchArrayPtr.ToString());
+            txt += txtFormat("lSynchArraySize", header.lSynchArraySize.ToString());
+            txt += txtFormat("nDataFormat", header.nDataFormat.ToString());
+            txt += txtFormat("nSimultaneousScan", header.nSimultaneousScan.ToString());
+            txt += txtFormat("lStatisticsConfigPtr", header.lStatisticsConfigPtr.ToString());
+            txt += txtFormat("lAnnotationSectionPtr", header.lAnnotationSectionPtr.ToString());
+            txt += txtFormat("lNumAnnotations", header.lNumAnnotations.ToString());
+            txt += txtFormat("lDACFilePtr", String.Join(", ", header.lDACFilePtr));
+            txt += txtFormat("lDACFileNumEpisodes", String.Join(", ", header.lDACFileNumEpisodes));
 
-            txt += txtValue("", "GROUP #3 - Trial hierarchy information");
-            txt += txtValue("nADCNumChannels", header.nADCNumChannels.ToString());
-            txt += txtValue("fADCSequenceInterval", header.fADCSequenceInterval.ToString());
-            txt += txtValue("uFileCompressionRatio", header.uFileCompressionRatio.ToString());
-            txt += txtValue("bEnableFileCompression", header.bEnableFileCompression.ToString());
-            txt += txtValue("fSynchTimeUnit", header.fSynchTimeUnit.ToString());
-            txt += txtValue("fSecondsPerRun", header.fSecondsPerRun.ToString());
-            txt += txtValue("lNumSamplesPerEpisode", header.lNumSamplesPerEpisode.ToString());
-            txt += txtValue("lPreTriggerSamples", header.lPreTriggerSamples.ToString());
-            txt += txtValue("lEpisodesPerRun", header.lEpisodesPerRun.ToString());
-            txt += txtValue("lRunsPerTrial", header.lRunsPerTrial.ToString());
-            txt += txtValue("lNumberOfTrials", header.lNumberOfTrials.ToString());
-            txt += txtValue("nAveragingMode", header.nAveragingMode.ToString());
-            txt += txtValue("nUndoRunCount", header.nUndoRunCount.ToString());
-            txt += txtValue("nFirstEpisodeInRun", header.nFirstEpisodeInRun.ToString());
-            txt += txtValue("fTriggerThreshold", header.fTriggerThreshold.ToString());
-            txt += txtValue("nTriggerSource", header.nTriggerSource.ToString());
-            txt += txtValue("nTriggerAction", header.nTriggerAction.ToString());
-            txt += txtValue("nTriggerPolarity", header.nTriggerPolarity.ToString());
-            txt += txtValue("fScopeOutputInterval", header.fScopeOutputInterval.ToString());
-            txt += txtValue("fEpisodeStartToStart", header.fEpisodeStartToStart.ToString());
-            txt += txtValue("fRunStartToStart", header.fRunStartToStart.ToString());
-            txt += txtValue("fTrialStartToStart", header.fTrialStartToStart.ToString());
-            txt += txtValue("lAverageCount", header.lAverageCount.ToString());
-            txt += txtValue("nAutoTriggerStrategy", header.nAutoTriggerStrategy.ToString());
-            txt += txtValue("fFirstRunDelayS", header.fFirstRunDelayS.ToString());
-            txt += txtValue("nTriggerTimeout", header.nTriggerTimeout.ToString());
+            txt += txtFormat("", "GROUP #3 - Trial hierarchy information");
+            txt += txtFormat("nADCNumChannels", header.nADCNumChannels.ToString());
+            txt += txtFormat("fADCSequenceInterval", header.fADCSequenceInterval.ToString());
+            txt += txtFormat("uFileCompressionRatio", header.uFileCompressionRatio.ToString());
+            txt += txtFormat("bEnableFileCompression", header.bEnableFileCompression.ToString());
+            txt += txtFormat("fSynchTimeUnit", header.fSynchTimeUnit.ToString());
+            txt += txtFormat("fSecondsPerRun", header.fSecondsPerRun.ToString());
+            txt += txtFormat("lNumSamplesPerEpisode", header.lNumSamplesPerEpisode.ToString());
+            txt += txtFormat("lPreTriggerSamples", header.lPreTriggerSamples.ToString());
+            txt += txtFormat("lEpisodesPerRun", header.lEpisodesPerRun.ToString());
+            txt += txtFormat("lRunsPerTrial", header.lRunsPerTrial.ToString());
+            txt += txtFormat("lNumberOfTrials", header.lNumberOfTrials.ToString());
+            txt += txtFormat("nAveragingMode", header.nAveragingMode.ToString());
+            txt += txtFormat("nUndoRunCount", header.nUndoRunCount.ToString());
+            txt += txtFormat("nFirstEpisodeInRun", header.nFirstEpisodeInRun.ToString());
+            txt += txtFormat("fTriggerThreshold", header.fTriggerThreshold.ToString());
+            txt += txtFormat("nTriggerSource", header.nTriggerSource.ToString());
+            txt += txtFormat("nTriggerAction", header.nTriggerAction.ToString());
+            txt += txtFormat("nTriggerPolarity", header.nTriggerPolarity.ToString());
+            txt += txtFormat("fScopeOutputInterval", header.fScopeOutputInterval.ToString());
+            txt += txtFormat("fEpisodeStartToStart", header.fEpisodeStartToStart.ToString());
+            txt += txtFormat("fRunStartToStart", header.fRunStartToStart.ToString());
+            txt += txtFormat("fTrialStartToStart", header.fTrialStartToStart.ToString());
+            txt += txtFormat("lAverageCount", header.lAverageCount.ToString());
+            txt += txtFormat("nAutoTriggerStrategy", header.nAutoTriggerStrategy.ToString());
+            txt += txtFormat("fFirstRunDelayS", header.fFirstRunDelayS.ToString());
+            txt += txtFormat("nTriggerTimeout", header.nTriggerTimeout.ToString());
 
-            txt += txtValue("", "GROUP #4 - Display Parameters");
-            txt += txtValue("nDataDisplayMode", header.nDataDisplayMode.ToString());
-            txt += txtValue("nChannelStatsStrategy", header.nChannelStatsStrategy.ToString());
-            txt += txtValue("lSamplesPerTrace", header.lSamplesPerTrace.ToString());
-            txt += txtValue("lStartDisplayNum", header.lStartDisplayNum.ToString());
-            txt += txtValue("lFinishDisplayNum", header.lFinishDisplayNum.ToString());
-            txt += txtValue("nShowPNRawData", header.nShowPNRawData.ToString());
-            txt += txtValue("fStatisticsPeriod", header.fStatisticsPeriod.ToString());
-            txt += txtValue("lStatisticsMeasurements", header.lStatisticsMeasurements.ToString());
-            txt += txtValue("nStatisticsSaveStrategy", header.nStatisticsSaveStrategy.ToString());
+            txt += txtFormat("", "GROUP #4 - Display Parameters");
+            txt += txtFormat("nDataDisplayMode", header.nDataDisplayMode.ToString());
+            txt += txtFormat("nChannelStatsStrategy", header.nChannelStatsStrategy.ToString());
+            txt += txtFormat("lSamplesPerTrace", header.lSamplesPerTrace.ToString());
+            txt += txtFormat("lStartDisplayNum", header.lStartDisplayNum.ToString());
+            txt += txtFormat("lFinishDisplayNum", header.lFinishDisplayNum.ToString());
+            txt += txtFormat("nShowPNRawData", header.nShowPNRawData.ToString());
+            txt += txtFormat("fStatisticsPeriod", header.fStatisticsPeriod.ToString());
+            txt += txtFormat("lStatisticsMeasurements", header.lStatisticsMeasurements.ToString());
+            txt += txtFormat("nStatisticsSaveStrategy", header.nStatisticsSaveStrategy.ToString());
 
-            txt += txtValue("", "GROUP #5 - Hardware information");
-            txt += txtValue("fADCRange", header.fADCRange.ToString());
-            txt += txtValue("fDACRange", header.fDACRange.ToString());
-            txt += txtValue("lADCResolution", header.lADCResolution.ToString());
-            txt += txtValue("lDACResolution", header.lDACResolution.ToString());
-            txt += txtValue("nDigitizerADCs", header.nDigitizerADCs.ToString());
-            txt += txtValue("nDigitizerDACs", header.nDigitizerDACs.ToString());
-            txt += txtValue("nDigitizerTotalDigitalOuts", header.nDigitizerTotalDigitalOuts.ToString());
-            txt += txtValue("nDigitizerSynchDigitalOuts", header.nDigitizerSynchDigitalOuts.ToString());
-            txt += txtValue("nDigitizerType", header.nDigitizerType.ToString());
+            txt += txtFormat("", "GROUP #5 - Hardware information");
+            txt += txtFormat("fADCRange", header.fADCRange.ToString());
+            txt += txtFormat("fDACRange", header.fDACRange.ToString());
+            txt += txtFormat("lADCResolution", header.lADCResolution.ToString());
+            txt += txtFormat("lDACResolution", header.lDACResolution.ToString());
+            txt += txtFormat("nDigitizerADCs", header.nDigitizerADCs.ToString());
+            txt += txtFormat("nDigitizerDACs", header.nDigitizerDACs.ToString());
+            txt += txtFormat("nDigitizerTotalDigitalOuts", header.nDigitizerTotalDigitalOuts.ToString());
+            txt += txtFormat("nDigitizerSynchDigitalOuts", header.nDigitizerSynchDigitalOuts.ToString());
+            txt += txtFormat("nDigitizerType", header.nDigitizerType.ToString());
 
-            txt += txtValue("", "GROUP #6 Environmental Information");
-            txt += txtValue("nExperimentType", header.nExperimentType.ToString());
-            txt += txtValue("nManualInfoStrategy", header.nManualInfoStrategy.ToString());
-            txt += txtValue("fCellID1", header.fCellID1.ToString());
-            txt += txtValue("fCellID2", header.fCellID2.ToString());
-            txt += txtValue("fCellID3", header.fCellID3.ToString());
-            txt += txtValue("sProtocolPath", header.sProtocolPath.ToString());
-            txt += txtValue("sCreatorInfo", header.sCreatorInfo.ToString());
-            txt += txtValue("sModifierInfo", header.sModifierInfo.ToString());
-            txt += txtValue("nCommentsEnable", header.nCommentsEnable.ToString());
-            txt += txtValue("sFileComment", header.sFileComment.ToString());
-            txt += txtArrayInt16("nTelegraphEnable", header.nTelegraphEnable, 16);
-            txt += txtArrayInt16("nTelegraphInstrument", header.nTelegraphInstrument, 16);
-            txt += txtArraySingle("fTelegraphAdditGain", header.fTelegraphAdditGain, 16);
-            txt += txtArraySingle("fTelegraphFilter", header.fTelegraphFilter, 16);
-            txt += txtArraySingle("fTelegraphMembraneCap", header.fTelegraphMembraneCap, 16);
-            txt += txtArraySingle("fTelegraphAccessResistance", header.fTelegraphAccessResistance, 16);
-            txt += txtArrayInt16("nTelegraphMode", header.nTelegraphMode, 16);
-            txt += txtArrayInt16("nTelegraphDACScaleFactorEnable", header.nTelegraphDACScaleFactorEnable, 8);
-            txt += txtValue("nAutoAnalyseEnable", header.nAutoAnalyseEnable.ToString());
-            txt += txtValue("FileGUID", header.FileGUID.ToString());
-            txt += txtArraySingle("fInstrumentHoldingLevel", header.fInstrumentHoldingLevel, 8);
-            txt += txtValue("ulFileCRC", header.ulFileCRC.ToString());
-            txt += txtValue("nCRCEnable", header.nCRCEnable.ToString());
+            txt += txtFormat("", "GROUP #6 Environmental Information");
+            txt += txtFormat("nExperimentType", header.nExperimentType.ToString());
+            txt += txtFormat("nManualInfoStrategy", header.nManualInfoStrategy.ToString());
+            txt += txtFormat("fCellID1", header.fCellID1.ToString());
+            txt += txtFormat("fCellID2", header.fCellID2.ToString());
+            txt += txtFormat("fCellID3", header.fCellID3.ToString());
+            txt += txtFormat("sProtocolPath", header.sProtocolPath.ToString());
+            txt += txtFormat("sCreatorInfo", header.sCreatorInfo.ToString());
+            txt += txtFormat("sModifierInfo", header.sModifierInfo.ToString());
+            txt += txtFormat("nCommentsEnable", header.nCommentsEnable.ToString());
+            txt += txtFormat("sFileComment", header.sFileComment.ToString());
+            txt += txtFormat("nTelegraphEnable", String.Join(", ", header.nTelegraphEnable));
+            txt += txtFormat("nTelegraphInstrument", String.Join(", ", header.nTelegraphInstrument));
+            txt += txtFormat("fTelegraphAdditGain", String.Join(", ", header.fTelegraphAdditGain));
+            txt += txtFormat("fTelegraphFilter", String.Join(", ", header.fTelegraphFilter));
+            txt += txtFormat("fTelegraphMembraneCap", String.Join(", ", header.fTelegraphMembraneCap));
+            txt += txtFormat("fTelegraphAccessResistance", String.Join(", ", header.fTelegraphAccessResistance));
+            txt += txtFormat("nTelegraphMode", String.Join(", ", header.nTelegraphMode));
+            txt += txtFormat("nTelegraphDACScaleFactorEnable", String.Join(", ", header.nTelegraphDACScaleFactorEnable));
+            txt += txtFormat("nAutoAnalyseEnable", header.nAutoAnalyseEnable.ToString());
+            txt += txtFormat("FileGUID", header.FileGUID.ToString());
+            txt += txtFormat("fInstrumentHoldingLevel", String.Join(", ", header.fInstrumentHoldingLevel));
+            txt += txtFormat("ulFileCRC", header.ulFileCRC.ToString());
+            txt += txtFormat("nCRCEnable", header.nCRCEnable.ToString());
 
-            txt += txtValue("", "GROUP #7 Multi-channel information");
-            txt += txtValue("nSignalType", header.nSignalType.ToString());
-            txt += txtArrayInt16("nADCPtoLChannelMap", header.nADCPtoLChannelMap, 16);
-            txt += txtArrayInt16("nADCSamplingSeq", header.nADCSamplingSeq, 16);
-            txt += txtArraySingle("fADCProgrammableGain", header.fADCProgrammableGain, 16);
-            txt += txtArraySingle("fADCDisplayAmplification", header.fADCDisplayAmplification, 16);
-            txt += txtArraySingle("fADCDisplayOffset", header.fADCDisplayOffset, 16);
-            txt += txtArraySingle("fInstrumentScaleFactor", header.fInstrumentScaleFactor, 16);
-            txt += txtArraySingle("fInstrumentOffset", header.fInstrumentOffset, 16);
-            txt += txtArraySingle("fSignalGain", header.fSignalGain, 16);
-            txt += txtArraySingle("fSignalOffset", header.fSignalOffset, 16);
-            txt += txtArraySingle("fSignalLowpassFilter", header.fSignalLowpassFilter, 16);
-            txt += txtArraySingle("fSignalHighpassFilter", header.fSignalHighpassFilter, 16);
-            txt += txtValue("nLowpassFilterType", header.nLowpassFilterType.ToString());
-            txt += txtValue("nHighpassFilterType", header.nHighpassFilterType.ToString());
-            txt += txtArrayByte("bHumFilterEnable", header.bHumFilterEnable, 16);
-            txt += txtArrayString("sADCChannelName", header.sADCChannelName, 10);
-            txt += txtArrayString("sADCUnits", header.sADCUnits, 8);
-            txt += txtArraySingle("fDACScaleFactor", header.fDACScaleFactor, 8);
-            txt += txtArraySingle("fDACHoldingLevel", header.fDACHoldingLevel, 8);
-            txt += txtArraySingle("fDACCalibrationFactor", header.fDACCalibrationFactor, 8);
-            txt += txtArraySingle("fDACCalibrationOffset", header.fDACCalibrationOffset, 8);
-            txt += txtArrayString("sDACChannelName", header.sDACChannelName, 10);
-            txt += txtArrayString("sDACChannelUnits", header.sDACChannelUnits, 8);
+            txt += txtFormat("", "GROUP #7 Multi-channel information");
+            txt += txtFormat("nSignalType", header.nSignalType.ToString());
+            txt += txtFormat("nADCPtoLChannelMap", String.Join(", ", header.nADCPtoLChannelMap));
+            txt += txtFormat("nADCSamplingSeq", String.Join(", ", header.nADCSamplingSeq));
+            txt += txtFormat("fADCProgrammableGain", String.Join(", ", header.fADCProgrammableGain));
+            txt += txtFormat("fADCDisplayAmplification", String.Join(", ", header.fADCDisplayAmplification));
+            txt += txtFormat("fADCDisplayOffset", String.Join(", ", header.fADCDisplayOffset));
+            txt += txtFormat("fInstrumentScaleFactor", String.Join(", ", header.fInstrumentScaleFactor));
+            txt += txtFormat("fInstrumentOffset", String.Join(", ", header.fInstrumentOffset));
+            txt += txtFormat("fSignalGain", String.Join(", ", header.fSignalGain));
+            txt += txtFormat("fSignalOffset", String.Join(", ", header.fSignalOffset));
+            txt += txtFormat("fSignalLowpassFilter", String.Join(", ", header.fSignalLowpassFilter));
+            txt += txtFormat("fSignalHighpassFilter", String.Join(", ", header.fSignalHighpassFilter));
+            txt += txtFormat("nLowpassFilterType", header.nLowpassFilterType.ToString());
+            txt += txtFormat("nHighpassFilterType", header.nHighpassFilterType.ToString());
+            txt += txtFormat("bHumFilterEnable", String.Join(", ", header.bHumFilterEnable));
+            txt += txtFormat("sADCChannelName", String.Join(", ", header.sADCChannelName));
+            txt += txtFormat("sADCUnits", String.Join(", ", header.sADCUnits));
+            txt += txtFormat("fDACScaleFactor", String.Join(", ", header.fDACScaleFactor));
+            txt += txtFormat("fDACHoldingLevel", String.Join(", ", header.fDACHoldingLevel));
+            txt += txtFormat("fDACCalibrationFactor", String.Join(", ", header.fDACCalibrationFactor));
+            txt += txtFormat("fDACCalibrationOffset", String.Join(", ", header.fDACCalibrationOffset));
+            txt += txtFormat("sDACChannelName", String.Join(", ", header.sDACChannelName));
+            txt += txtFormat("sDACChannelUnits", String.Join(", ", header.sDACChannelUnits));
 
-            txt += txtValue("", "GROUP #9 - Epoch Waveform and Pulses");
-            txt += txtValue("nDigitalEnable", header.nDigitalEnable.ToString());
-            txt += txtValue("nActiveDACChannel", header.nActiveDACChannel.ToString());
-            txt += txtValue("nDigitalDACChannel", header.nDigitalDACChannel.ToString());
-            txt += txtValue("nDigitalHolding", header.nDigitalHolding.ToString());
-            txt += txtValue("nDigitalInterEpisode", header.nDigitalInterEpisode.ToString());
-            txt += txtValue("nDigitalTrainActiveLogic", header.nDigitalTrainActiveLogic.ToString());
-            txt += txtArrayInt16("nDigitalValue", header.nDigitalValue, 50);
-            txt += txtArrayInt16("nDigitalTrainValue", header.nDigitalTrainValue, 50);
-            txt += txtArrayByte("bEpochCompression", header.bEpochCompression, 50);
-            txt += txtArrayInt16("nWaveformEnable", header.nWaveformEnable, 8);
-            txt += txtArrayInt16("nWaveformSource", header.nWaveformSource, 8);
-            txt += txtArrayInt16("nInterEpisodeLevel", header.nInterEpisodeLevel, 8 * 50);
-            txt += txtArrayInt16("nEpochType", header.nEpochType, 8 * 50);
-            txt += txtArraySingle("fEpochInitLevel", header.fEpochInitLevel, 8 * 50);
-            txt += txtArraySingle("fEpochFinalLevel", header.fEpochFinalLevel, 8 * 50);
-            txt += txtArraySingle("fEpochLevelInc", header.fEpochLevelInc, 8 * 50);
-            txt += txtArrayInt32("lEpochInitDuration", header.lEpochInitDuration, 8 * 50);
-            txt += txtArrayInt32("lEpochDurationInc", header.lEpochDurationInc, 8 * 50);
-            txt += txtArrayInt16("nEpochTableRepetitions", header.nEpochTableRepetitions, 8);
-            txt += txtArraySingle("fEpochTableStartToStartInterval", header.fEpochTableStartToStartInterval, 8);
+            txt += txtFormat("", "GROUP #9 - Epoch Waveform and Pulses");
+            txt += txtFormat("nDigitalEnable", header.nDigitalEnable.ToString()); txt += txtFormat("nActiveDACChannel", header.nActiveDACChannel.ToString());
+            txt += txtFormat("nDigitalDACChannel", header.nDigitalDACChannel.ToString()); txt += txtFormat("nDigitalHolding", header.nDigitalHolding.ToString());
+            txt += txtFormat("nDigitalInterEpisode", header.nDigitalInterEpisode.ToString()); txt += txtFormat("nDigitalTrainActiveLogic", header.nDigitalTrainActiveLogic.ToString());
+            txt += txtFormat("nDigitalValue", String.Join(", ", header.nDigitalValue)); txt += txtFormat("nDigitalTrainValue", String.Join(", ", header.nDigitalTrainValue));
+            txt += txtFormat("bEpochCompression", String.Join(", ", header.bEpochCompression)); txt += txtFormat("nWaveformEnable", String.Join(", ", header.nWaveformEnable));
+            txt += txtFormat("nWaveformSource", String.Join(", ", header.nWaveformSource));
+            txt += txtFormat("nInterEpisodeLevel", String.Join(", ", header.nInterEpisodeLevel));
+            txt += txtFormat("nEpochType", String.Join(", ", header.nEpochType));
+            txt += txtFormat("fEpochInitLevel", String.Join(", ", header.fEpochInitLevel));
+            txt += txtFormat("fEpochFinalLevel", String.Join(", ", header.fEpochFinalLevel));
+            txt += txtFormat("fEpochLevelInc", String.Join(", ", header.fEpochLevelInc));
+            txt += txtFormat("lEpochInitDuration", String.Join(", ", header.lEpochInitDuration));
+            txt += txtFormat("lEpochDurationInc", String.Join(", ", header.lEpochDurationInc));
+            txt += txtFormat("nEpochTableRepetitions", String.Join(", ", header.nEpochTableRepetitions));
+            txt += txtFormat("fEpochTableStartToStartInterval", String.Join(", ", header.fEpochTableStartToStartInterval));
 
-            txt += txtValue("", "GROUP #10 - DAC Output File");
-            txt += txtArraySingle("fDACFileScale", header.fDACFileScale, 8);
-            txt += txtArraySingle("fDACFileOffset", header.fDACFileOffset, 8);
-            txt += txtArrayInt32("lDACFileEpisodeNum", header.lDACFileEpisodeNum, 8);
-            txt += txtArrayInt16("nDACFileADCNum", header.nDACFileADCNum, 8);
-            txt += txtArrayString("sDACFilePath", header.sDACFilePath, 256);
+            txt += txtFormat("", "GROUP #10 - DAC Output File");
+            txt += txtFormat("fDACFileScale", String.Join(", ", header.fDACFileScale));
+            txt += txtFormat("fDACFileOffset", String.Join(", ", header.fDACFileOffset));
+            txt += txtFormat("lDACFileEpisodeNum", String.Join(", ", header.lDACFileEpisodeNum));
+            txt += txtFormat("nDACFileADCNum", String.Join(", ", header.nDACFileADCNum));
+            txt += txtFormat("sDACFilePath", String.Join(", ", header.sDACFilePath));
 
-            txt += txtValue("", "GROUP #11a - Presweep (conditioning) pulse train");
-            txt += txtArrayInt16("nConditEnable", header.nConditEnable, 8);
-            txt += txtArrayInt32("lConditNumPulses", header.lConditNumPulses, 8);
-            txt += txtArraySingle("fBaselineDuration", header.fBaselineDuration, 8);
-            txt += txtArraySingle("fBaselineLevel", header.fBaselineLevel, 8);
-            txt += txtArraySingle("fStepDuration", header.fStepDuration, 8);
-            txt += txtArraySingle("fStepLevel", header.fStepLevel, 8);
-            txt += txtArraySingle("fPostTrainPeriod", header.fPostTrainPeriod, 8);
-            txt += txtArraySingle("fPostTrainLevel", header.fPostTrainLevel, 8);
-            txt += txtArraySingle("fCTStartLevel", header.fCTStartLevel, 8 * 50);
-            txt += txtArraySingle("fCTEndLevel", header.fCTEndLevel, 8 * 50);
-            txt += txtArraySingle("fCTIntervalDuration", header.fCTIntervalDuration, 8 * 50);
-            txt += txtArraySingle("fCTStartToStartInterval", header.fCTStartToStartInterval, 8);
+            txt += txtFormat("", "GROUP #11a - Presweep (conditioning) pulse train");
+            txt += txtFormat("nConditEnable", String.Join(", ", header.nConditEnable));
+            txt += txtFormat("lConditNumPulses", String.Join(", ", header.lConditNumPulses));
+            txt += txtFormat("fBaselineDuration", String.Join(", ", header.fBaselineDuration));
+            txt += txtFormat("fBaselineLevel", String.Join(", ", header.fBaselineLevel));
+            txt += txtFormat("fStepDuration", String.Join(", ", header.fStepDuration));
+            txt += txtFormat("fStepLevel", String.Join(", ", header.fStepLevel));
+            txt += txtFormat("fPostTrainPeriod", String.Join(", ", header.fPostTrainPeriod));
+            txt += txtFormat("fPostTrainLevel", String.Join(", ", header.fPostTrainLevel));
+            txt += txtFormat("fCTStartLevel", String.Join(", ", header.fCTStartLevel));
+            txt += txtFormat("fCTEndLevel", String.Join(", ", header.fCTEndLevel));
+            txt += txtFormat("fCTIntervalDuration", String.Join(", ", header.fCTIntervalDuration));
+            txt += txtFormat("fCTStartToStartInterval", String.Join(", ", header.fCTStartToStartInterval));
 
-            txt += txtValue("", "GROUP #11b - Membrane Test Between Sweeps");
-            txt += txtArrayInt16("nMembTestEnable", header.nMembTestEnable, 8);
-            txt += txtArraySingle("fMembTestPreSettlingTimeMS", header.fMembTestPreSettlingTimeMS, 8);
-            txt += txtArraySingle("fMembTestPostSettlingTimeMS", header.fMembTestPostSettlingTimeMS, 8);
+            txt += txtFormat("", "GROUP #11b - Membrane Test Between Sweeps");
+            txt += txtFormat("nMembTestEnable", String.Join(", ", header.nMembTestEnable));
+            txt += txtFormat("fMembTestPreSettlingTimeMS", String.Join(", ", header.fMembTestPreSettlingTimeMS));
+            txt += txtFormat("fMembTestPostSettlingTimeMS", String.Join(", ", header.fMembTestPostSettlingTimeMS));
 
-            txt += txtValue("", "GROUP #11c - PreSignal test pulse");
-            txt += txtArrayInt16("nPreSignalEnable", header.nPreSignalEnable, 8);
-            txt += txtArraySingle("fPreSignalPreStepDuration", header.fPreSignalPreStepDuration, 8);
-            txt += txtArraySingle("fPreSignalPreStepLevel", header.fPreSignalPreStepLevel, 8);
-            txt += txtArraySingle("fPreSignalStepDuration", header.fPreSignalStepDuration, 8);
-            txt += txtArraySingle("fPreSignalStepLevel", header.fPreSignalStepLevel, 8);
-            txt += txtArraySingle("fPreSignalPostStepDuration", header.fPreSignalPostStepDuration, 8);
-            txt += txtArraySingle("fPreSignalPostStepLevel", header.fPreSignalPostStepLevel, 8);
+            txt += txtFormat("", "GROUP #11c - PreSignal test pulse");
+            txt += txtFormat("nPreSignalEnable", String.Join(", ", header.nPreSignalEnable));
+            txt += txtFormat("fPreSignalPreStepDuration", String.Join(", ", header.fPreSignalPreStepDuration));
+            txt += txtFormat("fPreSignalPreStepLevel", String.Join(", ", header.fPreSignalPreStepLevel));
+            txt += txtFormat("fPreSignalStepDuration", String.Join(", ", header.fPreSignalStepDuration));
+            txt += txtFormat("fPreSignalStepLevel", String.Join(", ", header.fPreSignalStepLevel));
+            txt += txtFormat("fPreSignalPostStepDuration", String.Join(", ", header.fPreSignalPostStepDuration));
+            txt += txtFormat("fPreSignalPostStepLevel", String.Join(", ", header.fPreSignalPostStepLevel));
 
-            txt += txtValue("", "GROUP #11d - Hum Silncer Adapt between sweeps");
-            txt += txtValue("nAdaptEnable", header.nAdaptEnable.ToString());
-            txt += txtValue("fInterSweepAdaptTimeS", header.fInterSweepAdaptTimeS.ToString());
+            txt += txtFormat("", "GROUP #11d - Hum Silncer Adapt between sweeps");
+            txt += txtFormat("nAdaptEnable", header.nAdaptEnable.ToString());
+            txt += txtFormat("fInterSweepAdaptTimeS", header.fInterSweepAdaptTimeS.ToString());
 
-            txt += txtValue("", "GROUP #12 - Variable parameter user list");
-            txt += txtArrayInt16("nULEnable", header.nULEnable, 4);
-            txt += txtArrayInt16("nULParamToVary", header.nULParamToVary, 4);
-            txt += txtArrayInt16("nULRepeat", header.nULRepeat, 4);
-            txt += txtArrayString("sULParamValueList", header.sULParamValueList, 256);
+            txt += txtFormat("", "GROUP #12 - Variable parameter user list");
+            txt += txtFormat("nULEnable", String.Join(", ", header.nULEnable));
+            txt += txtFormat("nULParamToVary", String.Join(", ", header.nULParamToVary));
+            txt += txtFormat("nULRepeat", String.Join(", ", header.nULRepeat));
+            txt += txtFormat("sULParamValueList", String.Join(", ", header.sULParamValueList));
 
-            txt += txtValue("", "GROUP #13 - Statistics measurements");
-            txt += txtValue("nStatsEnable", header.nStatsEnable.ToString());
-            txt += txtValue("nStatsActiveChannels", header.nStatsActiveChannels.ToString());
-            txt += txtValue("nStatsSearchRegionFlags", header.nStatsSearchRegionFlags.ToString());
-            txt += txtValue("nStatsSmoothing", header.nStatsSmoothing.ToString());
-            txt += txtValue("nStatsSmoothingEnable", header.nStatsSmoothingEnable.ToString());
-            txt += txtValue("nStatsBaseline", header.nStatsBaseline.ToString());
-            txt += txtValue("nStatsBaselineDAC", header.nStatsBaselineDAC.ToString());
-            txt += txtValue("lStatsBaselineStart", header.lStatsBaselineStart.ToString());
-            txt += txtValue("lStatsBaselineEnd", header.lStatsBaselineEnd.ToString());
-            txt += txtArrayInt32("lStatsMeasurements", header.lStatsMeasurements, 8);
-            txt += txtArrayInt32("lStatsStart", header.lStatsStart, 8);
-            txt += txtArrayInt32("lStatsEnd", header.lStatsEnd, 8);
-            txt += txtArrayInt16("nRiseBottomPercentile", header.nRiseBottomPercentile, 8);
-            txt += txtArrayInt16("nRiseTopPercentile", header.nRiseTopPercentile, 8);
-            txt += txtArrayInt16("nDecayBottomPercentile", header.nDecayBottomPercentile, 8);
-            txt += txtArrayInt16("nDecayTopPercentile", header.nDecayTopPercentile, 8);
-            txt += txtArrayInt16("nStatsChannelPolarity", header.nStatsChannelPolarity, 16);
-            txt += txtArrayInt16("nStatsSearchMode", header.nStatsSearchMode, 8);
-            txt += txtArrayInt16("nStatsSearchDAC", header.nStatsSearchDAC, 8);
+            txt += txtFormat("", "GROUP #13 - Statistics measurements");
+            txt += txtFormat("nStatsEnable", header.nStatsEnable.ToString());
+            txt += txtFormat("nStatsActiveChannels", header.nStatsActiveChannels.ToString());
+            txt += txtFormat("nStatsSearchRegionFlags", header.nStatsSearchRegionFlags.ToString());
+            txt += txtFormat("nStatsSmoothing", header.nStatsSmoothing.ToString());
+            txt += txtFormat("nStatsSmoothingEnable", header.nStatsSmoothingEnable.ToString());
+            txt += txtFormat("nStatsBaseline", header.nStatsBaseline.ToString());
+            txt += txtFormat("nStatsBaselineDAC", header.nStatsBaselineDAC.ToString());
+            txt += txtFormat("lStatsBaselineStart", header.lStatsBaselineStart.ToString());
+            txt += txtFormat("lStatsBaselineEnd", header.lStatsBaselineEnd.ToString());
+            txt += txtFormat("lStatsMeasurements", String.Join(", ", header.lStatsMeasurements));
+            txt += txtFormat("lStatsStart", String.Join(", ", header.lStatsStart));
+            txt += txtFormat("lStatsEnd", String.Join(", ", header.lStatsEnd));
+            txt += txtFormat("nRiseBottomPercentile", String.Join(", ", header.nRiseBottomPercentile));
+            txt += txtFormat("nRiseTopPercentile", String.Join(", ", header.nRiseTopPercentile));
+            txt += txtFormat("nDecayBottomPercentile", String.Join(", ", header.nDecayBottomPercentile));
+            txt += txtFormat("nDecayTopPercentile", String.Join(", ", header.nDecayTopPercentile));
+            txt += txtFormat("nStatsChannelPolarity", String.Join(", ", header.nStatsChannelPolarity));
+            txt += txtFormat("nStatsSearchMode", String.Join(", ", header.nStatsSearchMode));
+            txt += txtFormat("nStatsSearchDAC", String.Join(", ", header.nStatsSearchDAC));
 
-            txt += txtValue("", "GROUP #14 - Channel Arithmetic");
-            txt += txtValue("nArithmeticEnable", header.nArithmeticEnable.ToString());
-            txt += txtValue("nArithmeticExpression", header.nArithmeticExpression.ToString());
-            txt += txtValue("fArithmeticUpperLimit", header.fArithmeticUpperLimit.ToString());
-            txt += txtValue("fArithmeticLowerLimit", header.fArithmeticLowerLimit.ToString());
-            txt += txtValue("nArithmeticADCNumA", header.nArithmeticADCNumA.ToString());
-            txt += txtValue("nArithmeticADCNumB", header.nArithmeticADCNumB.ToString());
-            txt += txtValue("fArithmeticK1", header.fArithmeticK1.ToString());
-            txt += txtValue("fArithmeticK2", header.fArithmeticK2.ToString());
-            txt += txtValue("fArithmeticK3", header.fArithmeticK3.ToString());
-            txt += txtValue("fArithmeticK4", header.fArithmeticK4.ToString());
-            txt += txtValue("fArithmeticK5", header.fArithmeticK5.ToString());
-            txt += txtValue("fArithmeticK6", header.fArithmeticK6.ToString());
-            txt += txtValue("sArithmeticOperator", header.sArithmeticOperator.ToString());
-            txt += txtValue("sArithmeticUnits", header.sArithmeticUnits.ToString());
+            txt += txtFormat("", "GROUP #14 - Channel Arithmetic");
+            txt += txtFormat("nArithmeticEnable", header.nArithmeticEnable.ToString());
+            txt += txtFormat("nArithmeticExpression", header.nArithmeticExpression.ToString());
+            txt += txtFormat("fArithmeticUpperLimit", header.fArithmeticUpperLimit.ToString());
+            txt += txtFormat("fArithmeticLowerLimit", header.fArithmeticLowerLimit.ToString());
+            txt += txtFormat("nArithmeticADCNumA", header.nArithmeticADCNumA.ToString());
+            txt += txtFormat("nArithmeticADCNumB", header.nArithmeticADCNumB.ToString());
+            txt += txtFormat("fArithmeticK1", header.fArithmeticK1.ToString());
+            txt += txtFormat("fArithmeticK2", header.fArithmeticK2.ToString());
+            txt += txtFormat("fArithmeticK3", header.fArithmeticK3.ToString());
+            txt += txtFormat("fArithmeticK4", header.fArithmeticK4.ToString());
+            txt += txtFormat("fArithmeticK5", header.fArithmeticK5.ToString());
+            txt += txtFormat("fArithmeticK6", header.fArithmeticK6.ToString());
+            txt += txtFormat("sArithmeticOperator", header.sArithmeticOperator.ToString());
+            txt += txtFormat("sArithmeticUnits", header.sArithmeticUnits.ToString());
 
-            txt += txtValue("", "GROUP #15 - Leak subtraction");
-            txt += txtValue("nPNPosition", header.nPNPosition.ToString());
-            txt += txtValue("nPNNumPulses", header.nPNNumPulses.ToString());
-            txt += txtValue("nPNPolarity", header.nPNPolarity.ToString());
-            txt += txtValue("fPNSettlingTime", header.fPNSettlingTime.ToString());
-            txt += txtValue("fPNInterpulse", header.fPNInterpulse.ToString());
-            txt += txtArrayInt16("nLeakSubtractType", header.nLeakSubtractType, 8);
-            txt += txtArraySingle("fPNHoldingLevel", header.fPNHoldingLevel, 8);
-            txt += txtArrayInt16("nLeakSubtractADCIndex", header.nLeakSubtractADCIndex, 8);
+            txt += txtFormat("", "GROUP #15 - Leak subtraction");
+            txt += txtFormat("nPNPosition", header.nPNPosition.ToString());
+            txt += txtFormat("nPNNumPulses", header.nPNNumPulses.ToString());
+            txt += txtFormat("nPNPolarity", header.nPNPolarity.ToString());
+            txt += txtFormat("fPNSettlingTime", header.fPNSettlingTime.ToString());
+            txt += txtFormat("fPNInterpulse", header.fPNInterpulse.ToString());
+            txt += txtFormat("nLeakSubtractType", String.Join(", ", header.nLeakSubtractType));
+            txt += txtFormat("fPNHoldingLevel", String.Join(", ", header.fPNHoldingLevel));
+            txt += txtFormat("nLeakSubtractADCIndex", String.Join(", ", header.nLeakSubtractADCIndex));
 
-            txt += txtValue("", "GROUP #16 - Miscellaneous variables");
-            txt += txtValue("nLevelHysteresis", header.nLevelHysteresis.ToString());
-            txt += txtValue("lTimeHysteresis", header.lTimeHysteresis.ToString());
-            txt += txtValue("nAllowExternalTags", header.nAllowExternalTags.ToString());
-            txt += txtValue("nAverageAlgorithm", header.nAverageAlgorithm.ToString());
-            txt += txtValue("fAverageWeighting", header.fAverageWeighting.ToString());
-            txt += txtValue("nUndoPromptStrategy", header.nUndoPromptStrategy.ToString());
-            txt += txtValue("nTrialTriggerSource", header.nTrialTriggerSource.ToString());
-            txt += txtValue("nStatisticsDisplayStrategy", header.nStatisticsDisplayStrategy.ToString());
-            txt += txtValue("nExternalTagType", header.nExternalTagType.ToString());
-            txt += txtValue("lHeaderSize", header.lHeaderSize.ToString());
-            txt += txtValue("nStatisticsClearStrategy", header.nStatisticsClearStrategy.ToString());
-            txt += txtValue("nEnableFirstLastHolding", header.nEnableFirstLastHolding.ToString());
+            txt += txtFormat("", "GROUP #16 - Miscellaneous variables");
+            txt += txtFormat("nLevelHysteresis", header.nLevelHysteresis.ToString());
+            txt += txtFormat("lTimeHysteresis", header.lTimeHysteresis.ToString());
+            txt += txtFormat("nAllowExternalTags", header.nAllowExternalTags.ToString());
+            txt += txtFormat("nAverageAlgorithm", header.nAverageAlgorithm.ToString());
+            txt += txtFormat("fAverageWeighting", header.fAverageWeighting.ToString());
+            txt += txtFormat("nUndoPromptStrategy", header.nUndoPromptStrategy.ToString());
+            txt += txtFormat("nTrialTriggerSource", header.nTrialTriggerSource.ToString());
+            txt += txtFormat("nStatisticsDisplayStrategy", header.nStatisticsDisplayStrategy.ToString());
+            txt += txtFormat("nExternalTagType", header.nExternalTagType.ToString());
+            txt += txtFormat("lHeaderSize", header.lHeaderSize.ToString());
+            txt += txtFormat("nStatisticsClearStrategy", header.nStatisticsClearStrategy.ToString());
+            txt += txtFormat("nEnableFirstLastHolding", header.nEnableFirstLastHolding.ToString());
 
-            txt += txtValue("", "GROUP #17 - Trains parameters");
-            txt += txtArrayInt32("lEpochPulsePeriod", header.lEpochPulsePeriod, 50);
-            txt += txtArrayInt32("lEpochPulseWidth", header.lEpochPulseWidth, 50);
+            txt += txtFormat("", "GROUP #17 - Trains parameters");
+            txt += txtFormat("lEpochPulsePeriod", String.Join(", ", header.lEpochPulsePeriod));
+            txt += txtFormat("lEpochPulseWidth", String.Join(", ", header.lEpochPulseWidth));
 
-            txt += txtValue("", "GROUP #18 - Application version data");
-            txt += txtValue("nCreatorMajorVersion", header.nCreatorMajorVersion.ToString());
-            txt += txtValue("nCreatorMinorVersion", header.nCreatorMinorVersion.ToString());
-            txt += txtValue("nCreatorBugfixVersion", header.nCreatorBugfixVersion.ToString());
-            txt += txtValue("nCreatorBuildVersion", header.nCreatorBuildVersion.ToString());
-            txt += txtValue("nModifierMajorVersion", header.nModifierMajorVersion.ToString());
-            txt += txtValue("nModifierMinorVersion", header.nModifierMinorVersion.ToString());
-            txt += txtValue("nModifierBugfixVersion", header.nModifierBugfixVersion.ToString());
-            txt += txtValue("nModifierBuildVersion", header.nModifierBuildVersion.ToString());
+            txt += txtFormat("", "GROUP #18 - Application version data");
+            txt += txtFormat("nCreatorMajorVersion", header.nCreatorMajorVersion.ToString());
+            txt += txtFormat("nCreatorMinorVersion", header.nCreatorMinorVersion.ToString());
+            txt += txtFormat("nCreatorBugfixVersion", header.nCreatorBugfixVersion.ToString());
+            txt += txtFormat("nCreatorBuildVersion", header.nCreatorBuildVersion.ToString());
+            txt += txtFormat("nModifierMajorVersion", header.nModifierMajorVersion.ToString());
+            txt += txtFormat("nModifierMinorVersion", header.nModifierMinorVersion.ToString());
+            txt += txtFormat("nModifierBugfixVersion", header.nModifierBugfixVersion.ToString());
+            txt += txtFormat("nModifierBuildVersion", header.nModifierBuildVersion.ToString());
 
-            txt += txtValue("", "GROUP #19 - LTP protocol");
-            txt += txtValue("nLTPType", header.nLTPType.ToString());
-            txt += txtArrayInt16("nLTPUsageOfDAC", header.nLTPUsageOfDAC, 8);
-            txt += txtArrayInt16("nLTPPresynapticPulses", header.nLTPPresynapticPulses, 8);
+            txt += txtFormat("", "GROUP #19 - LTP protocol");
+            txt += txtFormat("nLTPType", header.nLTPType.ToString());
+            txt += txtFormat("nLTPUsageOfDAC", String.Join(", ", header.nLTPUsageOfDAC));
+            txt += txtFormat("nLTPPresynapticPulses", String.Join(", ", header.nLTPPresynapticPulses));
 
-            txt += txtValue("", "GROUP #20 - Digidata 132x Trigger out flag");
-            txt += txtValue("nScopeTriggerOut", header.nScopeTriggerOut.ToString());
+            txt += txtFormat("", "GROUP #20 - Digidata 132x Trigger out flag");
+            txt += txtFormat("nScopeTriggerOut", header.nScopeTriggerOut.ToString());
 
-            txt += txtValue("", "GROUP #21 - Epoch resistance");
-            txt += txtArrayString("sEpochResistanceSignalName", header.sEpochResistanceSignalName, 10);
-            txt += txtArrayInt16("nEpochResistanceState", header.nEpochResistanceState, 8);
+            txt += txtFormat("", "GROUP #21 - Epoch resistance");
+            txt += txtFormat("sEpochResistanceSignalName", String.Join(", ", header.sEpochResistanceSignalName));
+            txt += txtFormat("nEpochResistanceState", String.Join(", ", header.nEpochResistanceState));
 
-            txt += txtValue("", "GROUP #22 - Alternating episodic mode");
-            txt += txtValue("nAlternateDACOutputState", header.nAlternateDACOutputState.ToString());
-            txt += txtValue("nAlternateDigitalOutputState", header.nAlternateDigitalOutputState.ToString());
-            txt += txtArrayInt16("nAlternateDigitalValue", header.nAlternateDigitalValue, 50);
-            txt += txtArrayInt16("nAlternateDigitalTrainValue", header.nAlternateDigitalTrainValue, 50);
+            txt += txtFormat("", "GROUP #22 - Alternating episodic mode");
+            txt += txtFormat("nAlternateDACOutputState", header.nAlternateDACOutputState.ToString());
+            txt += txtFormat("nAlternateDigitalOutputState", header.nAlternateDigitalOutputState.ToString());
+            txt += txtFormat("nAlternateDigitalValue", String.Join(", ", header.nAlternateDigitalValue));
+            txt += txtFormat("nAlternateDigitalTrainValue", String.Join(", ", header.nAlternateDigitalTrainValue));
 
-            txt += txtValue("", "GROUP #23 - Post-processing actions");
-            txt += txtArraySingle("fPostProcessLowpassFilter", header.fPostProcessLowpassFilter, 16);
-            txt += txtValue("nPostProcessLowpassFilterType", header.nPostProcessLowpassFilterType.ToString());
+            txt += txtFormat("", "GROUP #23 - Post-processing actions");
+            txt += txtFormat("fPostProcessLowpassFilter", String.Join(", ", header.fPostProcessLowpassFilter));
+            txt += txtFormat("nPostProcessLowpassFilterType", header.nPostProcessLowpassFilterType.ToString());
 
-            txt += txtValue("", "GROUP #24 - Legacy gear shift info");
-            txt += txtValue("fLegacyADCSequenceInterval", header.fLegacyADCSequenceInterval.ToString());
-            txt += txtValue("fLegacyADCSecondSequenceInterval", header.fLegacyADCSecondSequenceInterval.ToString());
-            txt += txtValue("lLegacyClockChange", header.lLegacyClockChange.ToString());
-            txt += txtValue("lLegacyNumSamplesPerEpisode", header.lLegacyNumSamplesPerEpisode.ToString());
+            txt += txtFormat("", "GROUP #24 - Legacy gear shift info");
+            txt += txtFormat("fLegacyADCSequenceInterval", header.fLegacyADCSequenceInterval.ToString());
+            txt += txtFormat("fLegacyADCSecondSequenceInterval", header.fLegacyADCSecondSequenceInterval.ToString());
+            txt += txtFormat("lLegacyClockChange", header.lLegacyClockChange.ToString());
+            txt += txtFormat("lLegacyNumSamplesPerEpisode", header.lLegacyNumSamplesPerEpisode.ToString());
 
-            txt += txtValue("", "GROUP #25 - Gap-Free Config");
-            txt += txtArrayInt16("nGapFreeEpochType", header.nGapFreeEpochType, 8 * 50);
-            txt += txtArraySingle("fGapFreeEpochLevel", header.fGapFreeEpochLevel, 8 * 50);
-            txt += txtArrayInt32("lGapFreeEpochDuration", header.lGapFreeEpochDuration, 8 * 50);
-            txt += txtArrayByte("nGapFreeDigitalValue", header.nGapFreeDigitalValue, 8 * 50);
-            txt += txtValue("nGapFreeEpochStart", header.nGapFreeEpochStart.ToString());
+            txt += txtFormat("", "GROUP #25 - Gap-Free Config");
+            txt += txtFormat("nGapFreeEpochType", String.Join(", ", header.nGapFreeEpochType));
+            txt += txtFormat("fGapFreeEpochLevel", String.Join(", ", header.fGapFreeEpochLevel));
+            txt += txtFormat("lGapFreeEpochDuration", String.Join(", ", header.lGapFreeEpochDuration));
+            txt += txtFormat("nGapFreeDigitalValue", String.Join(", ", header.nGapFreeDigitalValue));
+            txt += txtFormat("nGapFreeEpochStart", header.nGapFreeEpochStart.ToString());
 
             return txt.Trim();
         }
