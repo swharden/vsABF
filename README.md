@@ -35,8 +35,14 @@ provided is for 32-bit ANSI C, not C#. Consider that a C# `long` is 8 bytes
 but to ANSI C it's 4. (In 32-bit ANSI C, `long` and `int` are actually the same
 length). Now consider that just to open an ABF, you need to first create a struct to hold all the header values. This nightmare of a struct has 239 variables (95 of which are arrays) and all the declaration types have to be perfect for the header to load properly. Not to mention the frustrations associated with marshalling bytes in unsafe code blocks. Further complicating matters is that many of the strings contain null characters. Now that the ABF header struct has been created using strict type declaration (e.g., `Int32` instead of `long`) for all these variables, interacting with the DLL became far easier. In other words, creating the struct was arduous, but now that it has been created it is relatively easy to use._
 
-# Misc Programs & Screenshots
+# Screenshots
 This project is still early in development. In this process, tools have been created to aid in the display and/or navigation of ABF files. These tools have been made available (poke around in [/dev](/dev)) to demonstrate various functions of the code.
+
+## Screenshots using ABFFIO.dll to read ABF data
+
+![](doc/graphics/abffio-csharp-visual-studio-vsABF-abf.png)
+
+## Screenshots using direct ABF file reading
 
 ### ABF Viewer
 ![](doc/graphics/screenshot.png)

@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4AC2431C-2CF7-4BE5-9BA8-4776E0A368A9}</ProjectGuid>
+    <ProjectGuid>{F00A4C2B-B2B6-40C9-AB7C-5FEF015B2FCA}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>AxonDLL</RootNamespace>
-    <AssemblyName>AxonDLL</AssemblyName>
+    <RootNamespace>Demo1</RootNamespace>
+    <AssemblyName>Demo1</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -22,7 +22,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,9 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbfReader.cs" />
-    <Compile Include="AbfStructDisplay.cs" />
-    <Compile Include="AbfStructs.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -82,6 +78,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AxonDLL\AxonDLL.csproj">
+      <Project>{4ac2431c-2cf7-4be5-9ba8-4776e0a368a9}</Project>
+      <Name>AxonDLL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ScottPlot\ScottPlot.csproj">
+      <Project>{146d9444-8d80-4049-ab17-55ae852f59e3}</Project>
+      <Name>ScottPlot</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

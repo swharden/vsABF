@@ -20,6 +20,14 @@ namespace AxonDLL
         [DllImport("ABFFIO.dll", CharSet = CharSet.Ansi)]
         private static extern bool ABF_ReadChannel(Int32 nFile, ref AbfStructs.ABFFileHeader pFH, Int32 nChannel, Int32 dwEpisode, ref float pfBuffer, ref UInt32 puNumSamples, ref Int32 pnError);
 
+        // prepare varaibles commonly passed to DLL functions
+        private static AbfStructs.ABFFileHeader header = new AbfStructs.ABFFileHeader();
+        private Int32 hFile = 0;
+        private UInt32 sweepPointCount = 0;
+        public UInt32 sweepCount = 0;
+        private Int32 errorCode = 0;
+        public int channelCount;
+
         public unsafe AbfReader(string abfFilePath)
         {
             // start the timer
@@ -27,19 +35,17 @@ namespace AxonDLL
             System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
             
             // prepare the arguments for ABF_ReadOpen() 
-            AbfStructs.ABFFileHeader header = new AbfStructs.ABFFileHeader();
-            Int32 hFile = 0;
-            UInt32 sweepPointCount = 0;
-            UInt32 sweepCount = 0;
-            Int32 errorCode = 0;
+            
             uint loadFlags = 0;
             errorCode = 0;
             ABF_ReadOpen(abfFilePath, ref hFile, loadFlags, ref header, ref sweepPointCount, ref sweepCount, ref errorCode);
             if (errorCode != 0) log($">>>ERROR: {errorCode}");
             
+            // update useful variables
+            channelCount = header.nADCNumChannels;
+
             // show every sweep of every channel
             float[] sweepBuffer = new float[sweepPointCount];
-            int channelCount = header.nADCNumChannels;
             for (int channel = 0; channel < channelCount; channel++)
             {
                 int physicalChannel = header.nADCSamplingSeq[channel];
@@ -61,6 +67,31 @@ namespace AxonDLL
             // display the full header
             log("\n\nFULL ABF HEADER:\n");
             log(AbfStructDisplay.headerToString(header));
+        }
+
+        /// <summary>
+        /// Return the scaled data for the given sweep and channel as a FLOAT array
+        /// </summary>
+        public float[] GetSweep(int sweepNumber, int channelNumber=0)
+        {
+            float[] sweepBuffer = new float[sweepPointCount];
+            int channelCount = header.nADCNumChannels;
+            int physicalChannel = header.nADCSamplingSeq[channelNumber];
+            log($"\nChannel {channelNumber} (phsical channel {physicalChannel}):");
+            errorCode = 0;
+            ABF_ReadChannel(hFile, ref header, physicalChannel, sweepNumber, ref sweepBuffer[0], ref sweepPointCount, ref errorCode);
+            if (errorCode != 0) log($"\n\n>>>ERROR: {errorCode}");
+            return sweepBuffer;
+        }
+
+        /// <summary>
+        /// Return the scaled data for the given sweep and channel as a DOUBLE array
+        /// </summary>
+        public double[] GetSweepDouble(int sweepNumber, int channelNumber = 0)
+        {
+            float[] sweepF = GetSweep(sweepNumber, channelNumber);
+            double[] sweepD = Array.ConvertAll(sweepF, x => (double)x);
+            return sweepD;
         }
     }
 }
