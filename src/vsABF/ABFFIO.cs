@@ -17,11 +17,11 @@ namespace vsABF
     public class ABFFIO
     {
 
-        public Logging log = new Logging();
+        public Logging log = new Logging(LogLevel.INFO);
         private UInt32 sweepPointCount;
         private string abfFilePath;
 
-        private ABFFIOstructs.ABFFileHeader header = new ABFFIOstructs.ABFFileHeader();
+        public ABFFIOstructs.ABFFileHeader header = new ABFFIOstructs.ABFFileHeader();
 
         public ABFFIO(string abfFilePath) {
 
@@ -49,6 +49,17 @@ namespace vsABF
 
         [DllImport("ABFFIO.dll", CharSet = CharSet.Ansi)]
         private static extern bool ABF_ReadChannel(Int32 nFile, ref ABFFIOstructs.ABFFileHeader pFH, Int32 nChannel, Int32 dwEpisode, ref float pfBuffer, ref UInt32 puNumSamples, ref Int32 pnError);
+
+        [DllImport("ABFFIO.dll", CharSet = CharSet.Ansi)]
+        private static extern bool ABF_Close(Int32 nFile, ref Int32 pnError);
+
+        public void Close()
+        {
+            Int32 fileHandle = 0;
+            Int32 errorCode = 0;
+            ABF_Close(fileHandle, ref errorCode);
+            log.Debug($"ABF file closed.");
+        }
 
         public bool IsABFFile()
         {

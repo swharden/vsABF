@@ -24,7 +24,7 @@ namespace vsABF
             string logLevelName = logLevelNames[(int)logLevel];
             string logLine = $"[{timestamp}] ({logLevelName}): {message}";
             logText = logText + logLine + "\n";
-            if (!this.silent)
+            if (!this.silent & logLevel>=this.logLevel)
                 System.Console.WriteLine(logLine);
         }
     }
