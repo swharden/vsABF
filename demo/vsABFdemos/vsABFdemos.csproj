@@ -80,6 +80,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\ABFInfoUC\ABFInfoUC.csproj">
+      <Project>{425d2705-ca65-4dff-bee3-b6b4d8e47b97}</Project>
+      <Name>ABFInfoUC</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\vsABF\vsABF.csproj">
       <Project>{7de71fff-88b5-4e6d-a09b-adb4c89a249d}</Project>
       <Name>vsABF</Name>
