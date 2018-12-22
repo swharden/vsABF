@@ -16,6 +16,9 @@ namespace vsABF
         public int sweepPointCount;
         public int sampleRate;
         public double sweepIntervalSec;
+        public string abfFilePath;
+        public string abfFilename;
+        public string abfID;
 
         // sweep properties
         public double[] sweepY;
@@ -29,12 +32,14 @@ namespace vsABF
         private Logging log = new Logging(LogLevel.INFO);
         ABFFIO abffio;
 
-        public ABF(string abfFilePath)
+        public ABF(string filePath)
         {
-            log.Debug($"loading {abfFilePath}");
-            abffio = new ABFFIO(abfFilePath);
+            log.Debug($"loading {filePath}");
+            abffio = new ABFFIO(filePath);
+            if (!abffio.validAbfFile)
+                return;
 
-            // set local variables based on the ABF
+            // set class variables based on the ABF
             sweepCount = abffio.header.lActualEpisodes;
             channelCount = abffio.header.nADCNumChannels;
             sweepPointCount = abffio.header.lNumSamplesPerEpisode / channelCount;
@@ -42,7 +47,9 @@ namespace vsABF
             sweepIntervalSec = abffio.header.fEpisodeStartToStart;
             if (sweepIntervalSec == 0)
                 sweepIntervalSec = (double)sweepPointCount / sampleRate;
-            Console.WriteLine("SWEEP INTERVAL: {sweepInterval}");
+            abfFilePath = filePath;
+            abfFilename = Path.GetFileName(abfFilePath);
+            abfID = Path.GetFileNameWithoutExtension(abfFilePath);
 
             // prepare the array to hold sweep data
             sweepY = new double[sweepPointCount];

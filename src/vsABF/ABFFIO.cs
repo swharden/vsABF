@@ -18,14 +18,26 @@ namespace vsABF
     {
 
         public Logging log = new Logging(LogLevel.INFO);
+        public bool validAbfFile = false;
+
         private UInt32 sweepPointCount;
         private string abfFilePath;
 
         public ABFFIOstructs.ABFFileHeader header = new ABFFIOstructs.ABFFileHeader();
 
-        public ABFFIO(string abfFilePath) {
+        public ABFFIO(string abfFilePath)
+        {
 
-            this.abfFilePath = abfFilePath;
+            // clean-up the file path
+            if (System.IO.File.Exists(abfFilePath))
+            {
+                this.abfFilePath = System.IO.Path.GetFullPath(abfFilePath);
+            }
+            else
+            {
+                log.Critical($"file does not exist: {abfFilePath}");
+                return;
+            }
 
             // prepare a stopwatch for benchmarking
             System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -39,6 +51,9 @@ namespace vsABF
             // benchmark to this point
             double timeMS = stopwatch.ElapsedTicks * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
             log.Debug(string.Format("ABFFIO initialization completed in {0:0.00} ms", timeMS));
+
+            // public indication the ABF loaded properly
+            validAbfFile = true;
         }
 
         [DllImport("ABFFIO.dll", CharSet = CharSet.Ansi)]
