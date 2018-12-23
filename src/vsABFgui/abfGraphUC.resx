@@ -219,6 +219,16 @@
         QAyCmGvvpHCmaVq9Au0VNfK2YfEo9QSpMgeKrZxGNwAAAABJRU5ErkJggg==
 </value>
   </data>
+  <data name="btnUndoSettings.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADoSURBVDhPrZA9DoIwGIa7uHsD78IVTNydGRz1At7AUR1Y
+        PYCrMfFn0ImExIkIGhR/Ctiw1vRNIKUpgglNnnw07ffw9SVpmvIMoixKabsKCGz3zt/xB5IkSXJhHSAg
+        3Slf2z5qqzdHHcw2uGAYRikFgWBk7fnJf6BZ7P8WCMRzrmGEb5owXPoFBMEzAlkO48UxmyDQBScDgRjH
+        NE3ueT4fWjs0b51L4U9l5AJR+5MVmp1ziL38Xh0FAWOMLw8u92+v3K42qBQE6kFdICihowtNpZkJRFNE
+        YyALZKmOZgXqQV1KQ0RAlYuQL/Pb4niDbNH1AAAAAElFTkSuQmCC
+</value>
+  </data>
   <data name="btnBaseline.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8

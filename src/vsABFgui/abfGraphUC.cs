@@ -311,5 +311,14 @@ namespace vsABFgui
             sweepTimeSecEnd = DialogGetNumber("trim end (sec)", "trim end");
             PlotSweep(1, 0);
         }
+
+        private void btnUndoSettings_Click(object sender, EventArgs e)
+        {
+            sweepTimeSecStart = -1;
+            sweepTimeSecEnd = -1;
+            sweepbaselineStart = -1;
+            sweepbaselineEnd = -1;
+            PlotSweep(1, 0);
+        }
     }
 }

@@ -53,6 +53,7 @@
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.btnBaseline = new System.Windows.Forms.ToolStripButton();
             this.btnTrim = new System.Windows.Forms.ToolStripButton();
+            this.btnUndoSettings = new System.Windows.Forms.ToolStripButton();
             this.tableLayoutPanel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -105,6 +106,7 @@
             this.btnViewStacked,
             this.btnViewContinuous,
             this.toolStripSeparator4,
+            this.btnUndoSettings,
             this.btnBaseline,
             this.btnTrim});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
@@ -291,6 +293,17 @@
             this.btnTrim.ToolTipText = "trim sweep";
             this.btnTrim.Click += new System.EventHandler(this.btnTrim_Click);
             // 
+            // btnUndoSettings
+            // 
+            this.btnUndoSettings.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnUndoSettings.Image = ((System.Drawing.Image)(resources.GetObject("btnUndoSettings.Image")));
+            this.btnUndoSettings.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnUndoSettings.Name = "btnUndoSettings";
+            this.btnUndoSettings.Size = new System.Drawing.Size(23, 22);
+            this.btnUndoSettings.Text = "toolStripButton1";
+            this.btnUndoSettings.ToolTipText = "reset";
+            this.btnUndoSettings.Click += new System.EventHandler(this.btnUndoSettings_Click);
+            // 
             // abfGraphUC
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -332,5 +345,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripButton btnBaseline;
         private System.Windows.Forms.ToolStripButton btnTrim;
+        private System.Windows.Forms.ToolStripButton btnUndoSettings;
     }
 }
