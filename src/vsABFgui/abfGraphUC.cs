@@ -172,5 +172,60 @@ namespace vsABFgui
             currentFilename = comboFilename.Text;
             LoadABF(currentFilePath);
         }
+
+        private void btnViewSweep_Click(object sender, EventArgs e)
+        {
+            SetSweep(abf.sweepNumber, abf.sweepChannel);
+        }
+
+        public double DialogGetNumber(string text, string caption, int valMin=1, int valMax=1000)
+        {
+            Form prompt = new Form();
+            prompt.Width = 250;
+            prompt.Height = 150;
+            prompt.Text = caption;
+            Label textLabel = new Label() { Left = 10, Top = 10, Text = text };
+            NumericUpDown nudVal = new NumericUpDown() { Left = 10, Top = 40, Width = 100 };
+            nudVal.Minimum = valMin;
+            nudVal.Maximum = valMax;
+            Button btnOk = new Button() { Text = "Ok", Left = 120, Top = 40, Width = 50 };
+            btnOk.Click += (sender, e) => { prompt.Close(); };
+            prompt.Controls.Add(btnOk);
+            prompt.Controls.Add(textLabel);
+            prompt.Controls.Add(nudVal);
+            prompt.ShowDialog();
+            return (double)nudVal.Value;
+        }
+
+        private void btnViewStacked_Click(object sender, EventArgs e)
+        {
+            if (abf == null)
+                return;
+            scottPlotUC1.Clear();
+            double offsetY = DialogGetNumber("what spacing?", "spacing");
+            for (int i = 0; i < abf.sweepCount; i++)
+            {
+                abf.SetSweep(i + 1, abf.sweepChannel);
+                var thisSweepData = new double[abf.sweepY.Length];
+                Array.Copy(abf.sweepY, thisSweepData, thisSweepData.Length);
+                scottPlotUC1.PlotSignal(thisSweepData, abf.sampleRate, offsetY: offsetY * i);
+            }
+            scottPlotUC1.AxisAuto();
+        }
+
+        private void btnViewContinuous_Click(object sender, EventArgs e)
+        {
+            if (abf == null)
+                return;
+            scottPlotUC1.Clear();
+            for (int i = 0; i < abf.sweepCount; i++)
+            {
+                abf.SetSweep(i + 1, abf.sweepChannel);
+                var thisSweepData = new double[abf.sweepY.Length];
+                Array.Copy(abf.sweepY, thisSweepData, thisSweepData.Length);
+                scottPlotUC1.PlotSignal(thisSweepData, abf.sampleRate, offsetX: i * abf.sweepIntervalSec);
+            }
+            scottPlotUC1.AxisAuto();
+        }
     }
 }

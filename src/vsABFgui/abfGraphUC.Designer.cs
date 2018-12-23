@@ -46,6 +46,10 @@
             this.comboSweep = new System.Windows.Forms.ToolStripComboBox();
             this.btnSweepPrev = new System.Windows.Forms.ToolStripButton();
             this.btnSweepNext = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnViewSweep = new System.Windows.Forms.ToolStripButton();
+            this.btnViewStacked = new System.Windows.Forms.ToolStripButton();
+            this.btnViewContinuous = new System.Windows.Forms.ToolStripButton();
             this.tableLayoutPanel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -56,7 +60,7 @@
             this.scottPlotUC1.Location = new System.Drawing.Point(2, 27);
             this.scottPlotUC1.Margin = new System.Windows.Forms.Padding(2);
             this.scottPlotUC1.Name = "scottPlotUC1";
-            this.scottPlotUC1.Size = new System.Drawing.Size(697, 331);
+            this.scottPlotUC1.Size = new System.Drawing.Size(725, 362);
             this.scottPlotUC1.TabIndex = 0;
             this.scottPlotUC1.Load += new System.EventHandler(this.scottPlotUC1_Load);
             // 
@@ -72,7 +76,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(701, 360);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(729, 391);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
             // toolStrip1
@@ -92,10 +96,14 @@
             this.toolStripLabel4,
             this.comboSweep,
             this.btnSweepPrev,
-            this.btnSweepNext});
+            this.btnSweepNext,
+            this.toolStripSeparator2,
+            this.btnViewSweep,
+            this.btnViewStacked,
+            this.btnViewContinuous});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(701, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(729, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -212,13 +220,51 @@
             this.btnSweepNext.Text = "toolStripButton6";
             this.btnSweepNext.Click += new System.EventHandler(this.btnSweepNext_Click);
             // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            // 
+            // btnViewSweep
+            // 
+            this.btnViewSweep.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnViewSweep.Image = ((System.Drawing.Image)(resources.GetObject("btnViewSweep.Image")));
+            this.btnViewSweep.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnViewSweep.Name = "btnViewSweep";
+            this.btnViewSweep.Size = new System.Drawing.Size(23, 22);
+            this.btnViewSweep.Text = "toolStripButton1";
+            this.btnViewSweep.ToolTipText = "single sweep view";
+            this.btnViewSweep.Click += new System.EventHandler(this.btnViewSweep_Click);
+            // 
+            // btnViewStacked
+            // 
+            this.btnViewStacked.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnViewStacked.Image = ((System.Drawing.Image)(resources.GetObject("btnViewStacked.Image")));
+            this.btnViewStacked.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnViewStacked.Name = "btnViewStacked";
+            this.btnViewStacked.Size = new System.Drawing.Size(23, 22);
+            this.btnViewStacked.Text = "toolStripButton2";
+            this.btnViewStacked.ToolTipText = "stacked sweeps view";
+            this.btnViewStacked.Click += new System.EventHandler(this.btnViewStacked_Click);
+            // 
+            // btnViewContinuous
+            // 
+            this.btnViewContinuous.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnViewContinuous.Image = ((System.Drawing.Image)(resources.GetObject("btnViewContinuous.Image")));
+            this.btnViewContinuous.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnViewContinuous.Name = "btnViewContinuous";
+            this.btnViewContinuous.Size = new System.Drawing.Size(23, 22);
+            this.btnViewContinuous.Text = "toolStripButton3";
+            this.btnViewContinuous.ToolTipText = "continuous view";
+            this.btnViewContinuous.Click += new System.EventHandler(this.btnViewContinuous_Click);
+            // 
             // abfGraphUC
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "abfGraphUC";
-            this.Size = new System.Drawing.Size(701, 360);
+            this.Size = new System.Drawing.Size(729, 391);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
@@ -246,5 +292,9 @@
         private System.Windows.Forms.ToolStripButton btnSweepPrev;
         private System.Windows.Forms.ToolStripButton btnSweepNext;
         private System.Windows.Forms.ToolStripButton btnSetFile;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripButton btnViewSweep;
+        private System.Windows.Forms.ToolStripButton btnViewStacked;
+        private System.Windows.Forms.ToolStripButton btnViewContinuous;
     }
 }
