@@ -45,15 +45,47 @@ namespace vsABFgui
         }
 
         // load a sweep using the single sweep view
-        public void SetSweep(int sweep, int channel)
+        public bool busy = false;
+        public double sweepTimeSecStart = -1;
+        public double sweepTimeSecEnd = -1;
+        public void PlotSweep(int sweep, int channel, bool clearFirst = true, bool render = true,
+                              double offsetX = 0, double offsetY = 0)
         {
+            if (busy)
+                return;
             if (sweep < 1)
                 return;
             if (sweep > abf.sweepCount)
                 return;
 
+            Console.WriteLine($"Setting Ch: {channel} Sw: {sweep}");
+            busy = true;
             abf.SetSweep(sweep, channel);
-            scottPlotUC1.PlotSignal(abf.sweepY, abf.sampleRate);
+
+            // prepare to copy the sweep array into a local array
+            int trimmedFirstIndex = 0;
+            int trimmedPointCount = abf.sweepY.Length;
+
+            // if trimming enabled, trim appropriately
+            if (sweepTimeSecStart >= 0 && sweepTimeSecEnd > sweepTimeSecStart)
+            {
+                double trimmedTimeSpanSec = sweepTimeSecEnd - sweepTimeSecStart;
+                trimmedFirstIndex = (int)(sweepTimeSecStart * abf.sampleRate);
+                trimmedFirstIndex = Math.Max(trimmedFirstIndex, 0);
+                trimmedPointCount = (int)(trimmedTimeSpanSec * abf.sampleRate);
+                trimmedPointCount = Math.Min(trimmedPointCount, abf.sweepPointCount - trimmedFirstIndex);
+                offsetX += sweepTimeSecStart;
+            }
+
+            // copy data from the ABF object into the local space
+            double[] sweepY = new double[trimmedPointCount];
+            Array.Copy(abf.sweepY, trimmedFirstIndex, sweepY, 0, trimmedPointCount);
+
+            // make the plot
+            if (clearFirst)
+                scottPlotUC1.Clear();
+            scottPlotUC1.PlotSignal(sweepY, abf.sampleRate, render: render, 
+                                    offsetX: offsetX, offsetY: offsetY);
 
             // sweep info and limits
             comboSweep.Text = sweep.ToString();
@@ -64,6 +96,10 @@ namespace vsABFgui
             comboChannel.Text = channel.ToString();
             btnChannelPrev.Enabled = (channel == 0) ? false : true;
             btnChannelNext.Enabled = (channel == abf.channelCount - 1) ? false : true;
+
+            // ensure new sweep redraws
+            Application.DoEvents();
+            busy = false;
         }
 
         public void SetFolder(string folderPath)
@@ -99,7 +135,7 @@ namespace vsABFgui
             // update the plot
             scottPlotUC1.Clear();
             scottPlotUC1.fig.labelTitle = abf.abfID;
-            SetSweep(1, 0);
+            PlotSweep(1, 0);
             scottPlotUC1.AxisAuto();
 
         }
@@ -122,36 +158,36 @@ namespace vsABFgui
 
         private void btnSweepPrev_Click(object sender, EventArgs e)
         {
-            SetSweep(abf.sweepNumber - 1, abf.sweepChannel);
+            PlotSweep(abf.sweepNumber - 1, abf.sweepChannel);
         }
 
         private void btnSweepNext_Click(object sender, EventArgs e)
         {
-            SetSweep(abf.sweepNumber + 1, abf.sweepChannel);
+            PlotSweep(abf.sweepNumber + 1, abf.sweepChannel);
         }
 
         private void comboSweep_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (int.TryParse(comboSweep.Text, out int sweep) && int.TryParse(comboChannel.Text, out int channel))
-                SetSweep(sweep, channel);
+                PlotSweep(sweep, channel);
         }
 
         private void btnChannelPrev_Click(object sender, EventArgs e)
         {
-            SetSweep(abf.sweepNumber, abf.sweepChannel - 1);
+            PlotSweep(abf.sweepNumber, abf.sweepChannel - 1);
             scottPlotUC1.AxisAuto();
         }
 
         private void btnChannelNext_Click(object sender, EventArgs e)
         {
-            SetSweep(abf.sweepNumber, abf.sweepChannel + 1);
+            PlotSweep(abf.sweepNumber, abf.sweepChannel + 1);
             scottPlotUC1.AxisAuto();
         }
 
         private void comboChannel_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (int.TryParse(comboSweep.Text, out int sweep) && int.TryParse(comboChannel.Text, out int channel))
-                SetSweep(sweep, channel);
+                PlotSweep(sweep, channel);
             scottPlotUC1.AxisAuto();
         }
 
@@ -175,10 +211,13 @@ namespace vsABFgui
 
         private void btnViewSweep_Click(object sender, EventArgs e)
         {
-            SetSweep(abf.sweepNumber, abf.sweepChannel);
+            if (abf == null)
+                return;
+            scottPlotUC1.Clear();
+            PlotSweep(abf.sweepNumber, abf.sweepChannel);
         }
 
-        public double DialogGetNumber(string text, string caption, int valMin=1, int valMax=1000)
+        public double DialogGetNumber(string text, string caption, int valMin = 0, int valMax = 1000)
         {
             Form prompt = new Form();
             prompt.Width = 250;
@@ -205,10 +244,7 @@ namespace vsABFgui
             double offsetY = DialogGetNumber("what spacing?", "spacing");
             for (int i = 0; i < abf.sweepCount; i++)
             {
-                abf.SetSweep(i + 1, abf.sweepChannel);
-                var thisSweepData = new double[abf.sweepY.Length];
-                Array.Copy(abf.sweepY, thisSweepData, thisSweepData.Length);
-                scottPlotUC1.PlotSignal(thisSweepData, abf.sampleRate, offsetY: offsetY * i);
+                PlotSweep(i + 1, abf.sweepChannel, clearFirst: false, render: false, offsetY: offsetY * i);
             }
             scottPlotUC1.AxisAuto();
         }
@@ -220,12 +256,40 @@ namespace vsABFgui
             scottPlotUC1.Clear();
             for (int i = 0; i < abf.sweepCount; i++)
             {
-                abf.SetSweep(i + 1, abf.sweepChannel);
-                var thisSweepData = new double[abf.sweepY.Length];
-                Array.Copy(abf.sweepY, thisSweepData, thisSweepData.Length);
-                scottPlotUC1.PlotSignal(thisSweepData, abf.sampleRate, offsetX: i * abf.sweepIntervalSec);
+                PlotSweep(i + 1, abf.sweepChannel, clearFirst: false, render: false, offsetX: i * abf.sweepIntervalSec);
             }
             scottPlotUC1.AxisAuto();
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (busy)
+                return true;
+            if ((keyData == Keys.Right) || (keyData == Keys.Up))
+            {
+                btnSweepNext_Click(null, null);
+                return true;
+            }
+            else if ((keyData == Keys.Left) || (keyData == Keys.Down))
+            {
+                btnSweepPrev_Click(null, null);
+                return true;
+            }
+            else
+            {
+                return base.ProcessCmdKey(ref msg, keyData);
+            }
+        }
+
+        private void btnBaseline_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnTrim_Click(object sender, EventArgs e)
+        {
+            sweepTimeSecStart = DialogGetNumber("sweep time start (sec)\n(-1 to disable)", "start time");
+            sweepTimeSecEnd = DialogGetNumber("sweep time end (sec)\n(0 to disable)", "end time");
         }
     }
 }

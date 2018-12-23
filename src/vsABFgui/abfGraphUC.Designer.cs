@@ -50,6 +50,9 @@
             this.btnViewSweep = new System.Windows.Forms.ToolStripButton();
             this.btnViewStacked = new System.Windows.Forms.ToolStripButton();
             this.btnViewContinuous = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnBaseline = new System.Windows.Forms.ToolStripButton();
+            this.btnTrim = new System.Windows.Forms.ToolStripButton();
             this.tableLayoutPanel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -100,7 +103,10 @@
             this.toolStripSeparator2,
             this.btnViewSweep,
             this.btnViewStacked,
-            this.btnViewContinuous});
+            this.btnViewContinuous,
+            this.toolStripSeparator4,
+            this.btnBaseline,
+            this.btnTrim});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(729, 25);
@@ -152,8 +158,8 @@
             // toolStripLabel3
             // 
             this.toolStripLabel3.Name = "toolStripLabel3";
-            this.toolStripLabel3.Size = new System.Drawing.Size(54, 22);
-            this.toolStripLabel3.Text = "Channel:";
+            this.toolStripLabel3.Size = new System.Drawing.Size(25, 22);
+            this.toolStripLabel3.Text = "Ch:";
             // 
             // comboChannel
             // 
@@ -190,8 +196,8 @@
             // toolStripLabel4
             // 
             this.toolStripLabel4.Name = "toolStripLabel4";
-            this.toolStripLabel4.Size = new System.Drawing.Size(44, 22);
-            this.toolStripLabel4.Text = "Sweep:";
+            this.toolStripLabel4.Size = new System.Drawing.Size(25, 22);
+            this.toolStripLabel4.Text = "Sw:";
             // 
             // comboSweep
             // 
@@ -258,6 +264,33 @@
             this.btnViewContinuous.ToolTipText = "continuous view";
             this.btnViewContinuous.Click += new System.EventHandler(this.btnViewContinuous_Click);
             // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
+            // 
+            // btnBaseline
+            // 
+            this.btnBaseline.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnBaseline.Image = ((System.Drawing.Image)(resources.GetObject("btnBaseline.Image")));
+            this.btnBaseline.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnBaseline.Name = "btnBaseline";
+            this.btnBaseline.Size = new System.Drawing.Size(23, 22);
+            this.btnBaseline.Text = "toolStripButton1";
+            this.btnBaseline.ToolTipText = "baseline subtraction";
+            this.btnBaseline.Click += new System.EventHandler(this.btnBaseline_Click);
+            // 
+            // btnTrim
+            // 
+            this.btnTrim.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnTrim.Image = ((System.Drawing.Image)(resources.GetObject("btnTrim.Image")));
+            this.btnTrim.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnTrim.Name = "btnTrim";
+            this.btnTrim.Size = new System.Drawing.Size(23, 22);
+            this.btnTrim.Text = "toolStripButton2";
+            this.btnTrim.ToolTipText = "trim sweep";
+            this.btnTrim.Click += new System.EventHandler(this.btnTrim_Click);
+            // 
             // abfGraphUC
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -296,5 +329,8 @@
         private System.Windows.Forms.ToolStripButton btnViewSweep;
         private System.Windows.Forms.ToolStripButton btnViewStacked;
         private System.Windows.Forms.ToolStripButton btnViewContinuous;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripButton btnBaseline;
+        private System.Windows.Forms.ToolStripButton btnTrim;
     }
 }
