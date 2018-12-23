@@ -48,6 +48,8 @@ namespace vsABFgui
         public bool busy = false;
         public double sweepTimeSecStart = -1;
         public double sweepTimeSecEnd = -1;
+        public double sweepbaselineStart = -1;
+        public double sweepbaselineEnd = -1;
         public void PlotSweep(int sweep, int channel, bool clearFirst = true, bool render = true,
                               double offsetX = 0, double offsetY = 0)
         {
@@ -65,6 +67,21 @@ namespace vsABFgui
             // prepare to copy the sweep array into a local array
             int trimmedFirstIndex = 0;
             int trimmedPointCount = abf.sweepY.Length;
+
+            // if baseline subtraction is enabled, adjust offsetY by the baseline region average
+            if (sweepbaselineStart >= 0 && sweepbaselineEnd > sweepbaselineStart)
+            {
+                int baselineIndex1 = (int)(sweepbaselineStart * abf.sampleRate);
+                baselineIndex1 = Math.Max(baselineIndex1, 0);
+                int baselineIndex2 = (int)(sweepbaselineEnd * abf.sampleRate);
+                baselineIndex2 = Math.Min(baselineIndex2, abf.sweepPointCount);
+                double baselineSum = 0;
+                for (int i = baselineIndex1; i < baselineIndex2; i++)
+                    baselineSum += abf.sweepY[i];
+                int baselinePointCount = baselineIndex2 - baselineIndex1;
+                double baselineValue = baselineSum / baselinePointCount;
+                offsetY -= baselineValue;
+            }
 
             // if trimming enabled, trim appropriately
             if (sweepTimeSecStart >= 0 && sweepTimeSecEnd > sweepTimeSecStart)
@@ -84,7 +101,7 @@ namespace vsABFgui
             // make the plot
             if (clearFirst)
                 scottPlotUC1.Clear();
-            scottPlotUC1.PlotSignal(sweepY, abf.sampleRate, render: render, 
+            scottPlotUC1.PlotSignal(sweepY, abf.sampleRate, render: render,
                                     offsetX: offsetX, offsetY: offsetY);
 
             // sweep info and limits
@@ -220,7 +237,7 @@ namespace vsABFgui
         public double DialogGetNumber(string text, string caption, int valMin = 0, int valMax = 1000)
         {
             Form prompt = new Form();
-            prompt.Width = 250;
+            prompt.Width = 350;
             prompt.Height = 150;
             prompt.Text = caption;
             Label textLabel = new Label() { Left = 10, Top = 10, Text = text };
@@ -283,13 +300,16 @@ namespace vsABFgui
 
         private void btnBaseline_Click(object sender, EventArgs e)
         {
-
+            sweepbaselineStart = DialogGetNumber("baseline start (sec)", "trim start");
+            sweepbaselineEnd = DialogGetNumber("baseline end (sec)", "trim end");
+            PlotSweep(1, 0);
         }
 
         private void btnTrim_Click(object sender, EventArgs e)
         {
-            sweepTimeSecStart = DialogGetNumber("sweep time start (sec)\n(-1 to disable)", "start time");
-            sweepTimeSecEnd = DialogGetNumber("sweep time end (sec)\n(0 to disable)", "end time");
+            sweepTimeSecStart = DialogGetNumber("trim start (sec)", "trim start");
+            sweepTimeSecEnd = DialogGetNumber("trim end (sec)", "trim end");
+            PlotSweep(1, 0);
         }
     }
 }
