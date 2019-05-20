@@ -19,6 +19,8 @@ namespace vsABF
         public string abfFilePath;
         public string abfFilename;
         public string abfID;
+        public string protocol;
+        public string protocolPath;
 
         // sweep properties
         public double[] sweepY;
@@ -50,6 +52,8 @@ namespace vsABF
             abfFilePath = filePath;
             abfFilename = Path.GetFileName(abfFilePath);
             abfID = Path.GetFileNameWithoutExtension(abfFilePath);
+            protocolPath = abffio.header.sProtocolPath;
+            protocol = System.IO.Path.GetFileNameWithoutExtension(protocolPath);
 
             // prepare the array to hold sweep data
             sweepY = new double[sweepPointCount];
