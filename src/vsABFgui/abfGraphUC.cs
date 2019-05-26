@@ -100,9 +100,9 @@ namespace vsABFgui
 
             // make the plot
             if (clearFirst)
-                scottPlotUC1.Clear();
-            scottPlotUC1.PlotSignal(sweepY, abf.sampleRate, render: render,
-                                    offsetX: offsetX, offsetY: offsetY);
+                scottPlotUC1.plt.Clear();
+            scottPlotUC1.plt.PlotSignal(sweepY, abf.sampleRate, xOffset: offsetX, yOffset: offsetY);
+            scottPlotUC1.Render();
 
             // sweep info and limits
             comboSweep.Text = sweep.ToString();
@@ -150,16 +150,16 @@ namespace vsABFgui
             comboFilename.Text = abf.abfFilename;
 
             // update the plot
-            scottPlotUC1.Clear();
-            scottPlotUC1.fig.labelTitle = abf.abfID;
+            scottPlotUC1.plt.Clear();
+            scottPlotUC1.plt.Title(abf.abfID);
             PlotSweep(1, 0);
-            scottPlotUC1.AxisAuto();
-
+            scottPlotUC1.plt.AxisAuto(0);
+            scottPlotUC1.Render();
         }
 
         private void scottPlotUC1_Load(object sender, EventArgs e)
         {
-            scottPlotUC1.fig.labelTitle = "Uninitialized ABF Graph";
+            scottPlotUC1.plt.Title("Uninitialized ABF Graph");
         }
 
         private void btnSetFile_Click(object sender, EventArgs e)
@@ -192,20 +192,23 @@ namespace vsABFgui
         private void btnChannelPrev_Click(object sender, EventArgs e)
         {
             PlotSweep(abf.sweepNumber, abf.sweepChannel - 1);
-            scottPlotUC1.AxisAuto();
+            scottPlotUC1.plt.AxisAuto(0);
+            scottPlotUC1.Render();
         }
 
         private void btnChannelNext_Click(object sender, EventArgs e)
         {
             PlotSweep(abf.sweepNumber, abf.sweepChannel + 1);
-            scottPlotUC1.AxisAuto();
+            scottPlotUC1.plt.AxisAuto(0);
+            scottPlotUC1.Render();
         }
 
         private void comboChannel_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (int.TryParse(comboSweep.Text, out int sweep) && int.TryParse(comboChannel.Text, out int channel))
                 PlotSweep(sweep, channel);
-            scottPlotUC1.AxisAuto();
+            scottPlotUC1.plt.AxisAuto(0);
+            scottPlotUC1.Render();
         }
 
         private void btnFilePrev_Click(object sender, EventArgs e)
@@ -230,7 +233,7 @@ namespace vsABFgui
         {
             if (abf == null)
                 return;
-            scottPlotUC1.Clear();
+            scottPlotUC1.plt.Clear();
             PlotSweep(abf.sweepNumber, abf.sweepChannel);
         }
 
@@ -257,25 +260,27 @@ namespace vsABFgui
         {
             if (abf == null)
                 return;
-            scottPlotUC1.Clear();
+            scottPlotUC1.plt.Clear();
             double offsetY = DialogGetNumber("what spacing?", "spacing");
             for (int i = 0; i < abf.sweepCount; i++)
             {
                 PlotSweep(i + 1, abf.sweepChannel, clearFirst: false, render: false, offsetY: offsetY * i);
             }
-            scottPlotUC1.AxisAuto();
+            scottPlotUC1.plt.AxisAuto(0);
+            scottPlotUC1.Render();
         }
 
         private void btnViewContinuous_Click(object sender, EventArgs e)
         {
             if (abf == null)
                 return;
-            scottPlotUC1.Clear();
+            scottPlotUC1.plt.Clear();
             for (int i = 0; i < abf.sweepCount; i++)
             {
                 PlotSweep(i + 1, abf.sweepChannel, clearFirst: false, render: false, offsetX: i * abf.sweepIntervalSec);
             }
-            scottPlotUC1.AxisAuto();
+            scottPlotUC1.plt.AxisAuto(0);
+            scottPlotUC1.Render();
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
