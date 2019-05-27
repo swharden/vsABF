@@ -26,11 +26,11 @@ namespace vsABF
         public const int ABF_ARITHMETICOPLEN = 2; // length of the Arithmetic operator field
         public const int ABF_ARITHMETICUNITSLEN = 8; // length of arithmetic units string
         public const int ABF_STATS_REGIONS = 24; // The number of independent statistics regions. // ST-91
+        public const int ABF_TAGCOMMENTLEN = 56; // length of tag comment string
 
         // These constants are ready to go, but not currently needed for anything
         //public const int ABF_ADCNAMELEN_USER = 8; // length of user-entered ADC channel name strings
         //public const int ABF_OLDFILECOMMENTLEN = 56; // length of file comment string (pre V1.6)
-        //public const int ABF_TAGCOMMENTLEN = 56; // length of tag comment string
         //public const int ABF_BLOCKSIZE = 512; // Size of block alignment in ABF files.
         //public const int PCLAMP6_MAXSWEEPLENGTH = 16384; // Maximum multiplexed sweep length supported by pCLAMP6 apps.
         //public const int PCLAMP7_MAXSWEEPLEN_PERCHAN = 1032258; // Maximum per channel sweep length supported by pCLAMP7 apps.
@@ -39,6 +39,15 @@ namespace vsABF
         //public const int ABF_MAX_TRIAL_SAMPLES = 0x7FFFFFFF; // Maximum length of acquisition supported (samples)
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
+        public struct ABFTag
+        {
+            public Int32 lTagTime;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = ABF_TAGCOMMENTLEN)] public byte[] sComment;
+            public Int16 nTagType;
+            public Int16 nVoiceTagNumber_or_nAnnotationIndex;
+        };
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
         public unsafe struct ABFFileHeader
         {
 

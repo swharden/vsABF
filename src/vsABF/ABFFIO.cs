@@ -68,6 +68,9 @@ namespace vsABF
         [DllImport("ABFFIO.dll", CharSet = CharSet.Ansi)]
         private static extern bool ABF_Close(Int32 nFile, ref Int32 pnError);
 
+        [DllImport("ABFFIO.dll", CharSet = CharSet.Ansi)]
+        private static extern bool ABF_ReadTags(Int32 nFile, ref ABFFIOstructs.ABFFileHeader pFH, UInt32 dwFirstTag, ref ABFFIOstructs.ABFTag pTagArray, UInt32 uNumTags, ref Int32 pnError);
+
         public void Close()
         {
             Int32 fileHandle = 0;
@@ -124,6 +127,23 @@ namespace vsABF
             log.Debug($"{desc}: {vals}");
 
             return sweepBuffer;
+        }
+
+        public ABFFIOstructs.ABFTag ReadTag(int tagIndex)
+        {
+            Int32 fileHandle = 0;
+            Int32 errorCode = 0;
+            ABFFIOstructs.ABFTag abfTag = new ABFFIOstructs.ABFTag();
+            ABF_ReadTags(fileHandle, ref header, (uint)tagIndex, ref abfTag, 1, ref errorCode);
+            return abfTag;
+        }
+
+        public ABFFIOstructs.ABFTag[] ReadTags()
+        {
+            ABFFIOstructs.ABFTag[] abfTags = new ABFFIOstructs.ABFTag[(UInt32)header.lNumTagEntries];
+            for (int i = 0; i < abfTags.Length; i++)
+                abfTags[i] = ReadTag(i);
+            return abfTags;
         }
 
         private void ProcessErrorCode(Int32 errorCode)
