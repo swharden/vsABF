@@ -21,6 +21,8 @@ namespace vsABF
         public string abfID;
         public string protocol;
         public string protocolPath;
+        public int tagCount;
+        public readonly List<Tag> tags = new List<Tag>();
 
         // sweep properties
         public double[] sweepY;
@@ -54,6 +56,10 @@ namespace vsABF
             abfID = Path.GetFileNameWithoutExtension(abfFilePath);
             protocolPath = abffio.header.sProtocolPath;
             protocol = System.IO.Path.GetFileNameWithoutExtension(protocolPath);
+            tagCount = abffio.header.lNumTagEntries;
+
+            // smarter stuff
+            ReadTags();
 
             // prepare the array to hold sweep data
             sweepY = new double[sweepPointCount];
@@ -67,6 +73,20 @@ namespace vsABF
         public void Close()
         {
             abffio.Close();
+        }
+
+        private void ReadTags()
+        {
+            tags.Clear();
+            ABFFIOstructs.ABFTag[] abfTags = abffio.ReadTags();
+            foreach (ABFFIOstructs.ABFTag abfTag in abfTags)
+            {
+                double timeSec = abfTag.lTagTime * abffio.header.fSynchTimeUnit / 1e6;
+                string comment = Encoding.UTF8.GetString(abfTag.sComment).Trim();
+                int timeSweep = (int)(timeSec / sweepIntervalSec);
+                Tag tag = new Tag(timeSec, timeSweep, comment, abfTag.nTagType);
+                tags.Add(tag);
+            }
         }
 
         /// <summary>

@@ -107,7 +107,7 @@
       <Project>{146D9444-8D80-4049-AB17-55AE852F59E3}</Project>
       <Name>ScottPlot</Name>
     </ProjectReference>
-    <ProjectReference Include="..\vsABF\vsABF.csproj">
+    <ProjectReference Include="..\..\src\vsABF\vsABF.csproj">
       <Project>{7de71fff-88b5-4e6d-a09b-adb4c89a249d}</Project>
       <Name>vsABF</Name>
     </ProjectReference>
