@@ -42,7 +42,7 @@ namespace vsABF
         public struct ABFTag
         {
             public Int32 lTagTime;
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = ABF_TAGCOMMENTLEN)] public byte[] sComment;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = ABF_TAGCOMMENTLEN)] public char[] sComment;
             public Int16 nTagType;
             public Int16 nVoiceTagNumber_or_nAnnotationIndex;
         };

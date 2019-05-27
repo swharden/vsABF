@@ -82,7 +82,7 @@ namespace vsABF
             foreach (ABFFIOstructs.ABFTag abfTag in abfTags)
             {
                 double timeSec = abfTag.lTagTime * abffio.header.fSynchTimeUnit / 1e6;
-                string comment = Encoding.UTF8.GetString(abfTag.sComment).Trim();
+                string comment = new string(abfTag.sComment).Trim();
                 int timeSweep = (int)(timeSec / sweepIntervalSec);
                 Tag tag = new Tag(timeSec, timeSweep, comment, abfTag.nTagType);
                 tags.Add(tag);
