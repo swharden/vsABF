@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28922.388
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABF-Analyzer", "ABF-Analyzer.csproj", "{FE159537-F539-4EB7-8BA3-2A09D27E2BCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vsABF", "..\..\src\vsABF\vsABF.csproj", "{7DE71FFF-88B5-4E6D-A09B-ADB4C89A249D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FE159537-F539-4EB7-8BA3-2A09D27E2BCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE159537-F539-4EB7-8BA3-2A09D27E2BCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE159537-F539-4EB7-8BA3-2A09D27E2BCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE159537-F539-4EB7-8BA3-2A09D27E2BCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DE71FFF-88B5-4E6D-A09B-ADB4C89A249D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DE71FFF-88B5-4E6D-A09B-ADB4C89A249D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DE71FFF-88B5-4E6D-A09B-ADB4C89A249D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DE71FFF-88B5-4E6D-A09B-ADB4C89A249D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6AD4A34E-D6E6-44C0-96DA-845F5276FCF4}
+	EndGlobalSection
+EndGlobal

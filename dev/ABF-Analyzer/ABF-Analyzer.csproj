@@ -4,15 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{820AA8C5-0327-44AF-9263-AB52C77A84EA}</ProjectGuid>
+    <ProjectGuid>{FE159537-F539-4EB7-8BA3-2A09D27E2BCF}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>vsABFgui</RootNamespace>
-    <AssemblyName>vsABFgui</AssemblyName>
+    <RootNamespace>ABF_Analyzer</RootNamespace>
+    <AssemblyName>ABF-Analyzer</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,10 +32,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>vsABFgui.Program</StartupObject>
-  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ScottPlot, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\ScottPlot.3.0.3\lib\net45\ScottPlot.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -50,34 +49,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="abfGraphUC.cs">
+    <Compile Include="DetectionParamatersUC.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="abfGraphUC.Designer.cs">
-      <DependentUpon>abfGraphUC.cs</DependentUpon>
+    <Compile Include="DetectionParamatersUC.Designer.cs">
+      <DependentUpon>DetectionParamatersUC.cs</DependentUpon>
     </Compile>
-    <Compile Include="abfInfoForm.cs">
+    <Compile Include="DetectionSettings.cs" />
+    <Compile Include="Detector.cs" />
+    <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="abfInfoForm.Designer.cs">
-      <DependentUpon>abfInfoForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="abfGraphForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="abfGraphForm.Designer.cs">
-      <DependentUpon>abfGraphForm.cs</DependentUpon>
+    <Compile Include="FormMain.Designer.cs">
+      <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="abfGraphUC.resx">
-      <DependentUpon>abfGraphUC.cs</DependentUpon>
+    <EmbeddedResource Include="DetectionParamatersUC.resx">
+      <DependentUpon>DetectionParamatersUC.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="abfInfoForm.resx">
-      <DependentUpon>abfInfoForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="abfGraphForm.resx">
-      <DependentUpon>abfGraphForm.cs</DependentUpon>
+    <EmbeddedResource Include="FormMain.resx">
+      <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -87,8 +79,8 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
