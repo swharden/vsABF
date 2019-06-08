@@ -48,11 +48,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ABFFIO.cs" />
+    <Compile Include="AbffioInterface.cs" />
     <Compile Include="ABFFIOstructs.cs" />
-    <Compile Include="Logging.cs" />
+    <Compile Include="AbfInfo.cs" />
     <Compile Include="Tag.cs" />
-    <Compile Include="vsABF.cs" />
+    <Compile Include="ABF.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

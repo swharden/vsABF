@@ -33,15 +33,11 @@ namespace vsABF
         public bool _invertSweepY = false;
 
         // internal objects
-        private Logging log = new Logging(LogLevel.INFO);
-        ABFFIO abffio;
+        AbffioInterface abffio;
 
         public ABF(string filePath)
         {
-            log.Debug($"loading {filePath}");
-            abffio = new ABFFIO(filePath);
-            if (!abffio.validAbfFile)
-                return;
+            abffio = new AbffioInterface(filePath);
 
             // set class variables based on the ABF
             sweepCount = abffio.header.lActualEpisodes;
@@ -66,8 +62,6 @@ namespace vsABF
 
             // load the first sweep of the first channel by default
             SetSweep(1, 0);
-
-            log.Debug($"initialization complete");
         }
 
         public void Close()
@@ -94,7 +88,6 @@ namespace vsABF
         /// </summary>
         public void SetSweep(int sweepNumber, int channelNumber = 0)
         {
-            log.Debug($"setting channel {channelNumber} sweep {sweepNumber}");
             var dataFloat = abffio.ReadChannel(sweepNumber, channelNumber);
             this.sweepNumber = sweepNumber;
             this.sweepChannel = channelNumber;
@@ -106,6 +99,21 @@ namespace vsABF
                 if (_invertSweepY)
                     sweepY[i] = -sweepY[i];
             }
+        }
+
+        public override string ToString()
+        {
+            string description = string.Format("{0} with {2} channels, {3} sweeps, {4} comments, recorded at {1:0.0} kHz",
+                abfFilename, sampleRate / 1000.0, channelCount, sweepCount, tagCount);
+            if (tagCount == 0)
+                description = description.Replace("0 comments, ", "");
+            else if (tagCount == 1)
+                description = description.Replace("comments", "comments");
+            if (channelCount == 1)
+                description = description.Replace("channels", "channel");
+            if (sweepCount == 1)
+                description = description.Replace("sweeps", "sweep");
+            return description;
         }
     }
 }

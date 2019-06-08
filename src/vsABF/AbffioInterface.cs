@@ -1,43 +1,31 @@
-﻿/*
- * Code here interacts with ABFFIO.DLL so you don't have to!
- * This is a minimal wrapper with only the most core functions 
- * in ABFFIO.DLL exposed.
+﻿/* 
+ *   The AbffioInterface class is a .NET interface to ABFFIO.DLL
+ *     written by Scott Harden as part of the vsABF Project
  * 
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
 namespace vsABF
 {
-    public class ABFFIO
+    public class AbffioInterface
     {
-
-        public Logging log = new Logging(LogLevel.INFO);
-        public bool validAbfFile = false;
+        // TODO: refactor this class after a test suite is up and running
 
         private UInt32 sweepPointCount;
         private string abfFilePath;
 
         public ABFFIOstructs.ABFFileHeader header = new ABFFIOstructs.ABFFileHeader();
 
-        public ABFFIO(string abfFilePath)
+        public AbffioInterface(string abfFilePath)
         {
 
             // clean-up the file path
             if (System.IO.File.Exists(abfFilePath))
-            {
                 this.abfFilePath = System.IO.Path.GetFullPath(abfFilePath);
-            }
             else
-            {
-                log.Critical($"file does not exist: {abfFilePath}");
-                return;
-            }
+                throw new ArgumentException($"file does not exist: {abfFilePath}");
 
             // prepare a stopwatch for benchmarking
             System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -50,10 +38,6 @@ namespace vsABF
 
             // benchmark to this point
             double timeMS = stopwatch.ElapsedTicks * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
-            log.Debug(string.Format("ABFFIO initialization completed in {0:0.00} ms", timeMS));
-
-            // public indication the ABF loaded properly
-            validAbfFile = true;
         }
 
         [DllImport("ABFFIO.dll", CharSet = CharSet.Ansi)]
@@ -79,7 +63,6 @@ namespace vsABF
             Int32 fileHandle = 0;
             Int32 errorCode = 0;
             ABF_Close(fileHandle, ref errorCode);
-            log.Debug($"ABF file closed.");
         }
 
         public bool IsABFFile()
@@ -87,7 +70,6 @@ namespace vsABF
             Int32 dataFormat = 0;
             Int32 errorCode = 0;
 
-            log.Debug($"Calling ABFFIO.DLL ABF_IsABFFile()");
             ABF_IsABFFile(abfFilePath, ref dataFormat, ref errorCode);
             ProcessErrorCode(errorCode);
 
@@ -105,7 +87,6 @@ namespace vsABF
             Int32 errorCode = 0;
             uint loadFlags = 0;
 
-            log.Debug($"Calling ABFFIO.DLL ABF_ReadOpen()");
             ABF_ReadOpen(abfFilePath, ref fileHandle, loadFlags, ref header, ref sweepPointCount, ref sweepCount, ref errorCode);
             ProcessErrorCode(errorCode);
 
@@ -121,13 +102,11 @@ namespace vsABF
             Int32 errorCode = 0;
             Int32 fileHandle = 0;
 
-            log.Debug($"Calling ABFFIO.DLL ABF_ReadOpen()");
             ABF_ReadChannel(fileHandle, ref header, physicalChannel, sweepNumber, ref sweepBuffer[0], ref sweepPointCount, ref errorCode);
             ProcessErrorCode(errorCode);
 
             string desc = $"Ch {channelNumber} ({physicalChannel}) Sweep {sweepNumber}";
             string vals = $"{sweepBuffer[0]}, {sweepBuffer[1]}, {sweepBuffer[2]}, ... , {sweepBuffer[sweepBuffer.Length - 2]}, {sweepBuffer[sweepBuffer.Length - 1]}";
-            log.Debug($"{desc}: {vals}");
 
             return sweepBuffer;
         }
@@ -190,12 +169,8 @@ namespace vsABF
             else if (errorCode == 1044) description = "ABF_EFILECORRUPT";
             else description = "UNKNOWN";
 
-            string errorMessage = $"error code: {errorCode} ({description})";
-
-            if (errorCode == 0)
-                log.Debug(errorMessage);
-            else
-                log.Critical(errorMessage);
+            if (errorCode != 0)
+                throw new Exception($"ABFFIO error code: {errorCode} ({description})");
         }
     }
 }
