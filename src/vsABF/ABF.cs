@@ -1,4 +1,18 @@
-﻿using System;
+﻿/* 
+ * The ABF class provides a modern .NET interface to files in the Axon Binary Format (ABF).
+ * 
+ * ABF access is provided by ABFFIO.DLL, but interacting with it is cumbersome, slow, and
+ * causes problems like file-locking. This class has been designed to maximize speed by 
+ * minimizing the interaction with this DLL. Upon instantiation the ABF class uses the DLL
+ * to read all header and sweep data into memory (and the DLL is not used again).
+ * 
+ * All sweep data is stored in memory as a 3D double array. This doesn't take-up that much
+ * memory: 1 hour of 20kHz data is just 576MB. The result is highspeed data analysis which 
+ * does not depend on file-locking DLL calls just to load data from different sweeps.
+ * 
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,61 +21,66 @@ using System.IO;
 
 namespace vsABF
 {
-    public class ABF
+
+    public class Sweep
     {
 
-        // ABF properties
-        public int sweepCount;
-        public int channelCount;
-        public int sweepPointCount;
-        public int sampleRate;
-        public double sweepIntervalSec;
-        public string abfFilePath;
-        public string abfFilename;
-        public string abfID;
-        public string protocol;
-        public string protocolPath;
-        public int tagCount;
-        public readonly List<Tag> tags = new List<Tag>();
+        private readonly AbfInfo info;
 
-        // sweep properties
-        public double[] sweepY;
-        public int sweepNumber = 0;
-        public int sweepChannel = 0;
+        public int number { get; private set; }
+        public int channel { get; private set; }
 
-        // developer flags
-        public bool _invertSweepY = false;
+        public readonly int length;
+        public readonly double lengthSec;
+        public readonly double lengthMin;
+        public readonly double intervalSec;
+        public readonly double intervalMin;
+        public readonly double[] values;
 
-        // internal objects
-        AbffioInterface abffio;
+        public Sweep(AbfInfo info)
+        {
+            this.info = info;
+            length = info.sweepLengthPoints;
+            lengthSec = info.sweepLengthSec;
+            lengthMin = info.sweepLengthMin;
+            intervalSec = info.sweepIntervalSec;
+            intervalMin = info.sweepIntervalMin;
+            values = new double[info.sweepLengthPoints];
+        }
+    }
 
-        public ABF(string filePath)
+    public class ABF : IDisposable
+    {
+
+        private AbffioInterface abffio;
+        public AbfInfo info;
+        public Sweep sweep;
+        public double[,,] data; // sweep, position, channel
+        private bool[,] dataLoaded; // sweep, channel
+
+        public ABF(string filePath, bool preLoadSweepData = true)
         {
             abffio = new AbffioInterface(filePath);
-
-            // set class variables based on the ABF
-            sweepCount = abffio.header.lActualEpisodes;
-            channelCount = abffio.header.nADCNumChannels;
-            sweepPointCount = abffio.header.lNumSamplesPerEpisode / channelCount;
-            sampleRate = (int)(1e6 / abffio.header.fADCSequenceInterval);
-            sweepIntervalSec = abffio.header.fEpisodeStartToStart;
-            if (sweepIntervalSec == 0)
-                sweepIntervalSec = (double)sweepPointCount / sampleRate;
-            abfFilePath = filePath;
-            abfFilename = Path.GetFileName(abfFilePath);
-            abfID = Path.GetFileNameWithoutExtension(abfFilePath);
-            protocolPath = abffio.header.sProtocolPath;
-            protocol = System.IO.Path.GetFileNameWithoutExtension(protocolPath);
-            tagCount = abffio.header.lNumTagEntries;
-
-            // smarter stuff
+            info = new AbfInfo(filePath, abffio.header);
+            sweep = new Sweep(info);
             ReadTags();
 
-            // prepare the array to hold sweep data
-            sweepY = new double[sweepPointCount];
+            if (preLoadSweepData)
+            {
+                LoadAllSweeps();
+                SetSweep(0, 0);
+            }
 
-            // load the first sweep of the first channel by default
-            SetSweep(1, 0);
+        }
+
+        public void Dispose()
+        {
+            Close();
+        }
+
+        public override string ToString()
+        {
+            return $"ABF ({info.fileName}) set to sweep X of {info.sweepCount}";
         }
 
         public void Close()
@@ -71,49 +90,56 @@ namespace vsABF
 
         private void ReadTags()
         {
-            tags.Clear();
+            // populates info.tags from data retrieved from abffio module
             ABFFIOstructs.ABFTag[] abfTags = abffio.ReadTags();
-            foreach (ABFFIOstructs.ABFTag abfTag in abfTags)
+            for (int i = 0; i < abfTags.Length; i++)
             {
+                ABFFIOstructs.ABFTag abfTag = abfTags[i];
                 double timeSec = abfTag.lTagTime * abffio.header.fSynchTimeUnit / 1e6;
                 string comment = new string(abfTag.sComment).Trim();
-                int timeSweep = (int)(timeSec / sweepIntervalSec);
+                int timeSweep = (int)(timeSec / info.sweepIntervalSec);
                 Tag tag = new Tag(timeSec, timeSweep, comment, abfTag.nTagType);
-                tags.Add(tag);
+                info.tags[i] = tag;
             }
         }
 
-        /// <summary>
-        /// Load data and units for the given sweep and channel. Sweeps start at 1, channels start at 0.
-        /// </summary>
-        public void SetSweep(int sweepNumber, int channelNumber = 0)
+        private void EnsureDataArrayExists()
         {
-            var dataFloat = abffio.ReadChannel(sweepNumber, channelNumber);
-            this.sweepNumber = sweepNumber;
-            this.sweepChannel = channelNumber;
-
-            // todo: move this to inside abffio
-            for (int i = 0; i < sweepPointCount; i++)
+            if (data == null)
             {
-                sweepY[i] = dataFloat[i];
-                if (_invertSweepY)
-                    sweepY[i] = -sweepY[i];
+                data = new double[info.sweepCount, info.sweepLengthPoints, info.channelCount];
+                dataLoaded = new bool[info.sweepCount, info.channelCount];
             }
         }
 
-        public override string ToString()
+        private void LoadSweep(int sweep, int channel = 0)
         {
-            string description = string.Format("{0} with {2} channels, {3} sweeps, {4} comments, recorded at {1:0.0} kHz",
-                abfFilename, sampleRate / 1000.0, channelCount, sweepCount, tagCount);
-            if (tagCount == 0)
-                description = description.Replace("0 comments, ", "");
-            else if (tagCount == 1)
-                description = description.Replace("comments", "comments");
-            if (channelCount == 1)
-                description = description.Replace("channels", "channel");
-            if (sweepCount == 1)
-                description = description.Replace("sweeps", "sweep");
-            return description;
+            EnsureDataArrayExists();
+            if (!dataLoaded[sweep, channel])
+            {
+                abffio.ReadChannel(sweep + 1, channel);
+                for (int i = 0; i < info.sweepLengthPoints; i++)
+                    data[sweep, i, channel] = abffio.sweepBuffer[i];
+                dataLoaded[sweep, channel] = true;
+            }
+        }
+
+        public void LoadAllSweeps()
+        {
+            EnsureDataArrayExists();
+            for (int channel = 0; channel < info.channelCount; channel++)
+                for (int sweep = 0; sweep < info.sweepCount; sweep++)
+                    LoadSweep(sweep, channel);
+        }
+
+        public void SetSweep(int sweepNumber = 0, int channelNumber = 0)
+        {
+            EnsureDataArrayExists();
+            if (!dataLoaded[sweepNumber, channelNumber])
+                LoadSweep(sweepNumber, channelNumber);
+
+            for (int i = 0; i < info.sweepLengthPoints; i++)
+                sweep.values[i] = data[sweepNumber, i, channelNumber];
         }
     }
 }
