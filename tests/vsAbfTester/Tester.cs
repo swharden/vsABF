@@ -15,20 +15,12 @@ namespace vsAbfTester
 
         public void testAbf(string abfFilePath)
         {
-            Console.WriteLine($"Testing {System.IO.Path.GetFileName(abfFilePath)} ...");
+            Console.WriteLine($"\nTesting {System.IO.Path.GetFileName(abfFilePath)}");
 
             using (var abf = new vsABF.ABF(abfFilePath, preLoadSweepData: false))
             {
-                // test first value of each channel against known values from pyABF
-                double[] firstValues = new double[abf.info.channelCount];
-                for (int channel = 0; channel < abf.info.channelCount; channel++)
-                {
-                    abf.SetSweep(0, channel);
-                    firstValues[channel] = abf.data[0, 0, channel];
-                }
-                AssertFirstValueMatches(abf.info.id, firstValues);
-                foreach (var tag in abf.info.tags)
-                    Console.WriteLine(" -- " + tag);
+                TestFirstValue(abf);
+                Console.WriteLine(abf.info);
             }
 
         }
@@ -37,6 +29,18 @@ namespace vsAbfTester
         {
             foreach (string abfFilePath in System.IO.Directory.GetFiles(abfFolderPath, "*.abf"))
                 testAbf(abfFilePath);
+        }
+
+        public void TestFirstValue(vsABF.ABF abf)
+        {
+            // test first value of each channel against known values from pyABF
+            double[] firstValues = new double[abf.info.channelCount];
+            for (int channel = 0; channel < abf.info.channelCount; channel++)
+            {
+                abf.SetSweep(0, channel);
+                firstValues[channel] = abf.data[0, 0, channel];
+            }
+            AssertFirstValueMatches(abf.info.id, firstValues);
         }
 
         public void AssertFirstValueMatches(string abfID, double[] firstValues)
@@ -118,6 +122,8 @@ namespace vsAbfTester
             bool fullLineInCode = pythonCode.Contains(predictedLine);
             if (abfIdInCode && !fullLineInCode)
                 throw new Exception($"Expected to find: {predictedLine}");
+            else
+                Console.WriteLine($"Verified first values");
         }
     }
 }

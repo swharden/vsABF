@@ -95,8 +95,50 @@ namespace vsABF
             tagCount = header.lNumTagEntries;
             tags = new Tag[tagCount];
 
-            protocolFilePath = header.sProtocolPath;
+            protocolFilePath = header.sProtocolPath.Trim();
+            if (protocolFilePath == "(untitled)")
+                protocolFilePath = "";
             protocol = System.IO.Path.GetFileNameWithoutExtension(protocolFilePath);
+        }
+
+        public override string ToString()
+        {
+            string info = "";
+
+            // use reflection to iterate through all public variables of this class
+            var fields = this.GetType().GetFields();
+            foreach (var field in fields)
+            {
+                // get the basic information for each item
+                string type = field.FieldType.ToString();
+                string name = field.Name;
+                string value = field.GetValue(this).ToString();
+
+                // customize string value of specific types
+                if (field.FieldType == typeof(double))
+                    value = string.Format("{0:0.0000}", (double)field.GetValue(this));
+                else if (
+                        field.FieldType == typeof(int) ||
+                        field.FieldType == typeof(Int16) ||
+                        field.FieldType == typeof(long)
+                        )
+                    value = string.Format("{0}", field.GetValue(this));
+                else if (field.FieldType == typeof(string))
+                    value = $"\"{field.GetValue(this)}\"";
+                else if (field.FieldType == typeof(Tag[]))
+                    foreach (Tag tag in (Tag[])field.GetValue(this))
+                        value += "\n" + tag.ToString();
+                else
+                    name = $"({type}) {name}";
+
+                if (value == "vsABF.Tag[]")
+                    continue;
+
+                info += $"{name}: {value}\n";
+            }
+
+            info = info.Trim();
+            return info;
         }
     }
 }
