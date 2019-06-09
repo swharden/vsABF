@@ -1,1 +1,0 @@
-This folder holds projects/code related to the use of Axon's DLL provided with their SDK.

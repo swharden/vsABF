@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vsAbfTester", "vsAbfTester.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vsABF", "..\..\src\vsABF\vsABF.csproj", "{7DE71FFF-88B5-4E6D-A09B-ADB4C89A249D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbfNavigator2", "..\..\..\..\..\Source\Repos\AbfNavigator2\AbfNavigator2.csproj", "{A99519A8-B93D-42C9-899D-E538E062F460}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{7DE71FFF-88B5-4E6D-A09B-ADB4C89A249D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DE71FFF-88B5-4E6D-A09B-ADB4C89A249D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DE71FFF-88B5-4E6D-A09B-ADB4C89A249D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A99519A8-B93D-42C9-899D-E538E062F460}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A99519A8-B93D-42C9-899D-E538E062F460}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A99519A8-B93D-42C9-899D-E538E062F460}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A99519A8-B93D-42C9-899D-E538E062F460}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

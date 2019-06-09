@@ -27,8 +27,8 @@ namespace vsABF
 
         private readonly AbfInfo info;
 
-        public int number { get; private set; }
-        public int channel { get; private set; }
+        public int number;
+        public int channel;
 
         public readonly int length;
         public readonly double lengthSec;
